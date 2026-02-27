@@ -1,1 +1,133 @@
-<!DOCTYPE html> <html> <head> <meta charset="UTF-8"> <title>Laboratory</title> <style> body{ margin:0; height:100vh; display:flex; justify-content:center; align-items:center; background:#111; color:#00ffff; font-family:Arial; } </style> </head> <body> <h1>Welcome to the Laboratory</h1> </body> </html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Esfera Gênese - Laboratory</title>
+<style>
+    body { margin: 0; overflow: hidden; background: black; }
+    canvas { display: block; }
+</style>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<script>
+const scene = new THREE.Scene();
+
+// Câmera
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
+camera.position.set(0, 5, 15);
+
+// Renderizador
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.physicallyCorrectLights = true;
+renderer.outputEncoding = THREE.sRGBEncoding;
+document.body.appendChild(renderer.domElement);
+
+// Luz do Sol
+const sunLight = new THREE.DirectionalLight(0xffffff, 3);
+sunLight.position.set(10, 20, 10);
+scene.add(sunLight);
+
+// Luz ambiente
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+scene.add(ambientLight);
+
+// Céu (meia esfera interna)
+const skyGeometry = new THREE.SphereGeometry(200, 64, 64, 0, Math.PI * 2, 0, Math.PI / 2);
+const skyMaterial = new THREE.MeshBasicMaterial({
+    color: 0x87ceeb,
+    side: THREE.BackSide
+});
+const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+scene.add(sky);
+
+// Solo
+const groundGeometry = new THREE.CircleGeometry(200, 64);
+const groundMaterial = new THREE.MeshStandardMaterial({
+    color: 0x228B22,
+    roughness: 0.8
+});
+const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+ground.rotation.x = -Math.PI / 2;
+scene.add(ground);
+
+// =======================
+// TOTEM FUTURISTA
+// =======================
+
+// Corpo do totem
+const totemGeometry = new THREE.CylinderGeometry(1, 1.2, 8, 32);
+const totemMaterial = new THREE.MeshStandardMaterial({
+    color: 0x111111,
+    metalness: 0.8,
+    roughness: 0.3
+});
+const totem = new THREE.Mesh(totemGeometry, totemMaterial);
+totem.position.set(0, 4, -20);
+scene.add(totem);
+
+// Tela do relógio
+const canvas = document.createElement("canvas");
+canvas.width = 512;
+canvas.height = 256;
+const context = canvas.getContext("2d");
+
+const texture = new THREE.CanvasTexture(canvas);
+
+const screenMaterial = new THREE.MeshBasicMaterial({
+    map: texture,
+    emissive: 0x00ffff,
+    emissiveIntensity: 1
+});
+
+const screenGeometry = new THREE.PlaneGeometry(3.5, 1.5);
+const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+screen.position.set(0, 5, -18.8);
+scene.add(screen);
+
+// Função para atualizar relógio
+function updateClock() {
+    const now = new Date();
+    const time = now.toLocaleTimeString();
+
+    context.fillStyle = "black";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.fillStyle = "#00ffff";
+    context.font = "bold 80px Arial";
+    context.textAlign = "center";
+    context.fillText(time, canvas.width / 2, 150);
+
+    texture.needsUpdate = true;
+}
+
+// Atualiza a cada segundo
+setInterval(updateClock, 1000);
+updateClock();
+
+// Ajuste de tela
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Animação
+function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+}
+
+animate();
+</script>
+
+</body>
+</html>
