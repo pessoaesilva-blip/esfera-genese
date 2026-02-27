@@ -64,17 +64,25 @@ scene.add(ground);
 // =======================
 
 // Corpo do totem
-const totemGeometry = new THREE.CylinderGeometry(1, 1.2, 8, 32);
-const totemMaterial = new THREE.MeshStandardMaterial({
-    color: 0x111111,
-    metalness: 0.8,
-    roughness: 0.3
-});
-const totem = new THREE.Mesh(totemGeometry, totemMaterial);
-totem.position.set(0, 4, -20);
-scene.add(totem);
+// =======================
+// ESFERA FLUTUANTE COM RELÓGIO
+// =======================
 
-// Tela do relógio
+// Grupo para unir esfera + tela
+const orbGroup = new THREE.Group();
+scene.add(orbGroup);
+
+// Esfera principal
+const orbGeometry = new THREE.SphereGeometry(3, 64, 64);
+const orbMaterial = new THREE.MeshStandardMaterial({
+    color: 0x111111,
+    metalness: 0.9,
+    roughness: 0.2
+});
+const orb = new THREE.Mesh(orbGeometry, orbMaterial);
+orbGroup.add(orb);
+
+// Canvas para relógio
 const canvas = document.createElement("canvas");
 canvas.width = 512;
 canvas.height = 256;
@@ -82,18 +90,23 @@ const context = canvas.getContext("2d");
 
 const texture = new THREE.CanvasTexture(canvas);
 
-const screenMaterial = new THREE.MeshBasicMaterial({
+const screenMaterial = new THREE.MeshStandardMaterial({
     map: texture,
-    emissive: 0x00ffff,
-    emissiveIntensity: 1
+    emissive: new THREE.Color(0x00ffff),
+    emissiveIntensity: 2,
+    metalness: 0.4,
+    roughness: 0.1
 });
 
-const screenGeometry = new THREE.PlaneGeometry(3.5, 1.5);
+const screenGeometry = new THREE.PlaneGeometry(4, 2);
 const screen = new THREE.Mesh(screenGeometry, screenMaterial);
-screen.position.set(0, 5, -18.8);
-scene.add(screen);
+screen.position.set(0, 0, 2.95);
+orbGroup.add(screen);
 
-// Função para atualizar relógio
+// Posição inicial
+orbGroup.position.set(0, 6, -10);
+
+// Atualiza relógio
 function updateClock() {
     const now = new Date();
     const time = now.toLocaleTimeString();
@@ -102,14 +115,13 @@ function updateClock() {
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     context.fillStyle = "#00ffff";
-    context.font = "bold 80px Arial";
+    context.font = "bold 90px Arial";
     context.textAlign = "center";
-    context.fillText(time, canvas.width / 2, 150);
+    context.fillText(time, canvas.width / 2, 160);
 
     texture.needsUpdate = true;
 }
 
-// Atualiza a cada segundo
 setInterval(updateClock, 1000);
 updateClock();
 
