@@ -1,1 +1,176 @@
-<!DOCTYPE html> <html> <head> <meta charset="UTF-8"> <title>Esfera Genese</title> <style> body{ margin:0; height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-family:Arial; } .sphere{ width:200px; height:200px; border-radius:50%; background:radial-gradient(circle,#4f7cff,#0f0f2e); display:flex; justify-content:center; align-items:center; box-shadow:0 0 40px #4f7cff; cursor:pointer; } </style> </head> <body> <div class="sphere" onclick="enter()">ENTER</div> <script> function enter(){ window.location.href="laboratory.html"; } </script> </body> </html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Esfera Gênese - Laboratory</title>
+
+<style>
+    body { margin: 0; overflow: hidden; background: black; }
+    canvas { display: block; }
+</style>
+
+</head>
+<body>
+
+<script type="module">
+
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+// =======================
+// CENA
+// =======================
+const scene = new THREE.Scene();
+
+// =======================
+// CÂMERA
+// =======================
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
+camera.position.set(0, 5, 15);
+
+// =======================
+// RENDERER (ATUALIZADO)
+// =======================
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+// =======================
+// LUZ DO SOL
+// =======================
+const sunLight = new THREE.DirectionalLight(0xffffff, 3);
+sunLight.position.set(10, 20, 10);
+scene.add(sunLight);
+
+// =======================
+// LUZ AMBIENTE
+// =======================
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+scene.add(ambientLight);
+
+// =======================
+// CÉU
+// =======================
+const skyGeometry = new THREE.SphereGeometry(
+    200,
+    64,
+    64,
+    0,
+    Math.PI * 2,
+    0,
+    Math.PI / 2
+);
+
+const skyMaterial = new THREE.MeshBasicMaterial({
+    color: 0x87ceeb,
+    side: THREE.BackSide
+});
+
+const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+scene.add(sky);
+
+// =======================
+// SOLO
+// =======================
+const groundGeometry = new THREE.CircleGeometry(200, 64);
+
+const groundMaterial = new THREE.MeshStandardMaterial({
+    color: 0x228B22,
+    roughness: 0.8
+});
+
+const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+ground.rotation.x = -Math.PI / 2;
+scene.add(ground);
+
+// =======================
+// TOTEM FUTURISTA
+// =======================
+
+// Corpo
+const totemGeometry = new THREE.CylinderGeometry(1, 1.2, 8, 32);
+
+const totemMaterial = new THREE.MeshStandardMaterial({
+    color: 0x111111,
+    metalness: 0.8,
+    roughness: 0.3
+});
+
+const totem = new THREE.Mesh(totemGeometry, totemMaterial);
+totem.position.set(0, 4, -20);
+scene.add(totem);
+
+// =======================
+// TELA DO RELÓGIO
+// =======================
+
+const clockCanvas = document.createElement("canvas");
+clockCanvas.width = 512;
+clockCanvas.height = 256;
+
+const context = clockCanvas.getContext("2d");
+
+const texture = new THREE.CanvasTexture(clockCanvas);
+
+const screenMaterial = new THREE.MeshBasicMaterial({
+    map: texture
+});
+
+const screenGeometry = new THREE.PlaneGeometry(3.5, 1.5);
+
+const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+screen.position.set(0, 5, -18.8);
+scene.add(screen);
+
+// =======================
+// ATUALIZA RELÓGIO
+// =======================
+
+function updateClock() {
+    const now = new Date();
+    const time = now.toLocaleTimeString();
+
+    context.fillStyle = "black";
+    context.fillRect(0, 0, clockCanvas.width, clockCanvas.height);
+
+    context.fillStyle = "#00ffff";
+    context.font = "bold 80px Arial";
+    context.textAlign = "center";
+    context.fillText(time, clockCanvas.width / 2, 150);
+
+    texture.needsUpdate = true;
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+// =======================
+// RESPONSIVO
+// =======================
+
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// =======================
+// ANIMAÇÃO
+// =======================
+
+function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
