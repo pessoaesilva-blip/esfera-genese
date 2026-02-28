@@ -77,13 +77,24 @@ const screenGeometry = new THREE.SphereGeometry(
     Math.PI * 0.45, 
     Math.PI * 0.1
 );
-const orbMaterial = new THREE.MeshStandardMaterial({
-    color: 0x111111,
-    metalness: 0.9,
-    roughness: 0.2
+const screenMaterial = new THREE.MeshStandardMaterial({
+    map: texture,
+    emissive: new THREE.Color(0x00ffff),
+    emissiveIntensity: 3,
+    metalness: 0.6,
+    roughness: 0.1
 });
 const orb = new THREE.Mesh(orbGeometry, orbMaterial);
 orbGroup.add(orb);
+
+const glowGeometry = new THREE.SphereGeometry(3.3, 64, 64);
+const glowMaterial = new THREE.MeshBasicMaterial({
+    color: 0x00ffff,
+    transparent: true,
+    opacity: 0.08
+});
+const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+orbGroup.add(glow);
 
 // Canvas para relógio
 const canvas = document.createElement("canvas");
@@ -107,7 +118,7 @@ screen.position.set(0, 0, 2.95);
 orbGroup.add(screen);
 
 // Posição inicial
-orbGroup.position.set(0, 6, -10);
+orbGroup.position.set(0, 7, -12);
 
 // Atualiza relógio
 function updateClock() {
