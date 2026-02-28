@@ -68,7 +68,15 @@ const orbGroup = new THREE.Group();
 scene.add(orbGroup);
 
 // Esfera principal
-const orbGeometry = new THREE.SphereGeometry(3, 64, 64);
+const screenGeometry = new THREE.SphereGeometry(
+    3.05, 
+    64, 
+    64, 
+    Math.PI * 0.4, 
+    Math.PI * 0.2, 
+    Math.PI * 0.45, 
+    Math.PI * 0.1
+);
 const orbMaterial = new THREE.MeshStandardMaterial({
     color: 0x111111,
     metalness: 0.9,
