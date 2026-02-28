@@ -149,16 +149,8 @@ window.addEventListener("resize", () => {
 // Animação
 function animate() {
     requestAnimationFrame(animate);
-
-    const time = Date.now() * 0.002;
-
-    orbGroup.position.y = 6 + Math.sin(time) * 0.8;
-    orbGroup.rotation.y += 0.005;
-
     renderer.render(scene, camera);
 }
-
-animate();
 </script>
 
 </body>
