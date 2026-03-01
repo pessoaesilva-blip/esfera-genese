@@ -1,144 +1,51 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Gênese</title>
-  <style>
-    body { margin: 0; background: black; overflow: hidden; font-family: 'Arial', sans-serif; }
-    .genese-text {
-      position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-      font-size: 2em; color: #ffffff; text-align: center; z-index: 10;
-    }
-    .progress-container {
-      position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%);
-      width: 300px; height: 20px; background: #333; border-radius: 10px;
-      overflow: hidden; display: none;
-    }
-    .progress-bar {
-      height: 100%; width: 0%; background: linear-gradient(90deg, #88ccff, #ffffff);
-      transition: width 0.2s;
-    }
-    #scene { width: 100%; height: 100%; display: none; }
-  </style>
-</head>
-<body>
-  <div class="genese-text" id="texto">
-    No princípio, havia apenas o vazio.<br>
-    Da escuridão nasceu a luz.<br>
-    E da luz, o cosmos começou a se formar.<br>
-    Esta é a Gênese do Universo.
-  </div>
-  <div class="progress-container" id="progress-container">
-    <div class="progress-bar" id="progress"></div>
-  </div>
-  <canvas id="scene"></canvas>
+// Sala
+const roomGeometry = new THREE.BoxGeometry(1000, 500, 1000);
+const floorTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/metal.jpg");
+const roomMaterial = new THREE.MeshPhongMaterial({ map: floorTexture, side: THREE.BackSide });
+const room = new THREE.Mesh(roomGeometry, roomMaterial);
+scene.add(room);
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-  <script>
-    const texto = document.getElementById("texto");
-    const progressContainer = document.getElementById("progress-container");
-    const progressBar = document.getElementById("progress");
-    const duration = 15000;
+// Cúpula azul
+const domeGeometry = new THREE.SphereGeometry(500, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
+const domeMaterial = new THREE.MeshPhongMaterial({ color: 0x3399ff, transparent: true, opacity: 0.5 });
+const dome = new THREE.Mesh(domeGeometry, domeMaterial);
+dome.position.y = 250;
+scene.add(dome);
 
-    setTimeout(() => {
-      progressContainer.style.display = "block";
-      let startTime = Date.now();
-      function updateProgress() {
-        let elapsed = Date.now() - startTime;
-        let percent = Math.min((elapsed / duration) * 100, 100);
-        progressBar.style.width = percent + "%";
-        if (elapsed < duration) requestAnimationFrame(updateProgress);
-        else {
-          texto.style.display = "none";
-          progressContainer.style.display = "none";
-          iniciarCenario();
-        }
-      }
-      updateProgress();
-    }, 15000);
+// Praça central
+const plazaGeometry = new THREE.CircleGeometry(100, 32);
+const plazaMaterial = new THREE.MeshLambertMaterial({ color: 0x666666 });
+const plaza = new THREE.Mesh(plazaGeometry, plazaMaterial);
+plaza.rotation.x = -Math.PI/2;
+scene.add(plaza);
 
-    function iniciarCenario() {
-      const canvas = document.getElementById("scene");
-      canvas.style.display = "block";
+// Bancos
+for (let i = 0; i < 4; i++) {
+  const benchGeometry = new THREE.BoxGeometry(60, 10, 20);
+  const benchMaterial = new THREE.MeshLambertMaterial({ color: 0x999999 });
+  const bench = new THREE.Mesh(benchGeometry, benchMaterial);
+  const angle = (i / 4) * Math.PI * 2;
+  bench.position.set(Math.cos(angle) * 120, 5, Math.sin(angle) * 120);
+  scene.add(bench);
+}
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
-      const renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
-      renderer.setSize(window.innerWidth, window.innerHeight);
+// Entidade luminosa
+const entityGeometry = new THREE.SphereGeometry(10, 32, 32);
+const entityMaterial = new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.7 });
+const entity = new THREE.Mesh(entityGeometry, entityMaterial);
+entity.position.set(0, 20, 0);
+scene.add(entity);
 
-      // Céu simples
-      const skyGeometry = new THREE.SphereGeometry(2000, 16, 16);
-      const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87CEEB, side: THREE.BackSide });
-      const sky = new THREE.Mesh(skyGeometry, skyMaterial);
-      scene.add(sky);
-
-      // Terreno orgânico leve
-      const terrainGeometry = new THREE.PlaneGeometry(2000, 2000, 30, 30);
-      terrainGeometry.rotateX(-Math.PI/2);
-      const pos = terrainGeometry.attributes.position;
-      for (let i = 0; i < pos.count; i++) {
-        const x = pos.getX(i);
-        const z = pos.getZ(i);
-        const y = Math.sin(x * 0.001) * 30 + Math.cos(z * 0.001) * 30; // ondulações suaves
-        pos.setY(i, y);
-      }
-      terrainGeometry.computeVertexNormals();
-      const terrainMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
-      const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
-      scene.add(terrain);
-
-      // Montanha central simples
-      const mountainGeometry = new THREE.SphereGeometry(300, 16, 16);
-      const mountainMaterial = new THREE.MeshLambertMaterial({ color: 0x444444 });
-      const mountain = new THREE.Mesh(mountainGeometry, mountainMaterial);
-      mountain.position.set(0, -100, -800);
-      scene.add(mountain);
-
-      // Entidade luminosa
-      const entityGeometry = new THREE.SphereGeometry(5, 32, 32);
-      const entityMaterial = new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.6 });
-      const entity = new THREE.Mesh(entityGeometry, entityMaterial);
-      entity.position.set(0, 5, 0);
-      scene.add(entity);
-
-      // 12 esferas flutuantes
-      const spheres = [];
-      for (let i = 0; i < 12; i++) {
-        const angle = (i / 12) * Math.PI * 2;
-        const x = Math.cos(angle) * 30;
-        const z = Math.sin(angle) * 30;
-        const sphereGeo = new THREE.SphereGeometry(2, 16, 16);
-        const sphereMat = new THREE.MeshPhongMaterial({color: 0xffffff});
-        const s = new THREE.Mesh(sphereGeo, sphereMat);
-        s.position.set(x, 5, z);
-        scene.add(s);
-        spheres.push(s);
-      }
-
-      // Luz
-      scene.add(new THREE.AmbientLight(0x888888));
-      const sunLight = new THREE.DirectionalLight(0xffffff, 1);
-      sunLight.position.set(100, 200, 100);
-      scene.add(sunLight);
-
-      camera.position.set(0, 150, 300);
-
-      function animate() {
-        requestAnimationFrame(animate);
-        spheres.forEach((s, i) => {
-          s.position.y = 5 + Math.sin(Date.now() * 0.002 + i) * 2;
-        });
-        sky.rotation.y += 0.0001;
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-    }
-  </script>
-</body>
-</html>
+// 12 esferas flutuantes
+const spheres = [];
+for (let i = 0; i < 12; i++) {
+  const angle = (i / 12) * Math.PI * 2;
+  const x = Math.cos(angle) * 60;
+  const z = Math.sin(angle) * 60;
+  const sphereGeo = new THREE.SphereGeometry(5, 16, 16);
+  const sphereMat = new THREE.MeshPhongMaterial({ color: 0xffffff });
+  const s = new THREE.Mesh(sphereGeo, sphereMat);
+  s.position.set(x, 20, z);
+  scene.add(s);
+  spheres.push(s);
+}
