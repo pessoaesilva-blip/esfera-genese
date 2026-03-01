@@ -62,19 +62,19 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 4000);
     const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
     // Fundo estelar
     const starGeometry = new THREE.BufferGeometry();
-    const starCount = 3000;
+    const starCount = 4000;
     const starVertices = [];
     for (let i = 0; i < starCount; i++) {
-      const x = (Math.random() - 0.5) * 4000;
-      const y = (Math.random() - 0.5) * 4000;
-      const z = (Math.random() - 0.5) * 4000;
+      const x = (Math.random() - 0.5) * 6000;
+      const y = (Math.random() - 0.5) * 6000;
+      const z = (Math.random() - 0.5) * 6000;
       starVertices.push(x, y, z);
     }
     starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
@@ -96,30 +96,22 @@
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     scene.add(sphere);
 
-    // Nebulosas e galáxias simuladas
-    function createNebula(color, size, position) {
-      const nebulaGeometry = new THREE.SphereGeometry(size, 32, 32);
-      const nebulaMaterial = new THREE.MeshBasicMaterial({
-        color: color,
-        transparent: true,
-        opacity: 0.15
-      });
-      const nebula = new THREE.Mesh(nebulaGeometry, nebulaMaterial);
-      nebula.position.set(...position);
-      scene.add(nebula);
-    }
+    camera.position.z = 8;
 
-    createNebula(0xff66cc, 80, [200, 100, -600]);
-    createNebula(0x66ffcc, 120, [-300, -150, -800]);
-    createNebula(0xccccff, 100, [400, -200, -1000]);
-    createNebula(0xffff99, 150, [-500, 300, -1200]);
-
-    camera.position.z = 6;
-
+    // Efeito de movimento lento da câmera (como viagem pelo espaço)
+    let angle = 0;
     function animate() {
       requestAnimationFrame(animate);
+
+      // Rotação da esfera
       sphere.rotation.y += 0.002;
-      stars.rotation.y += 0.0003;
+
+      // Movimento suave da câmera em órbita
+      angle += 0.0005;
+      camera.position.x = Math.sin(angle) * 10;
+      camera.position.z = Math.cos(angle) * 10;
+      camera.lookAt(scene.position);
+
       renderer.render(scene, camera);
     }
     animate();
