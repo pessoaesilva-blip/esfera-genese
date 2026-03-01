@@ -72,18 +72,27 @@
       const sky = new THREE.Mesh(skyGeometry, skyMaterial);
       scene.add(sky);
 
-      // Terreno orgânico simplificado
-      const terrainGeometry = new THREE.PlaneGeometry(2000, 2000, 50, 50);
+      // Terreno orgânico leve
+      const terrainGeometry = new THREE.PlaneGeometry(2000, 2000, 30, 30);
       terrainGeometry.rotateX(-Math.PI/2);
       const pos = terrainGeometry.attributes.position;
       for (let i = 0; i < pos.count; i++) {
-        const y = (Math.random() - 0.5) * 50; // pequenas variações
+        const x = pos.getX(i);
+        const z = pos.getZ(i);
+        const y = Math.sin(x * 0.001) * 30 + Math.cos(z * 0.001) * 30; // ondulações suaves
         pos.setY(i, y);
       }
       terrainGeometry.computeVertexNormals();
       const terrainMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
       const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
       scene.add(terrain);
+
+      // Montanha central simples
+      const mountainGeometry = new THREE.SphereGeometry(300, 16, 16);
+      const mountainMaterial = new THREE.MeshLambertMaterial({ color: 0x444444 });
+      const mountain = new THREE.Mesh(mountainGeometry, mountainMaterial);
+      mountain.position.set(0, -100, -800);
+      scene.add(mountain);
 
       // Entidade luminosa
       const entityGeometry = new THREE.SphereGeometry(5, 32, 32);
@@ -112,7 +121,7 @@
       sunLight.position.set(100, 200, 100);
       scene.add(sunLight);
 
-      camera.position.set(0, 100, 200);
+      camera.position.set(0, 150, 300);
 
       function animate() {
         requestAnimationFrame(animate);
