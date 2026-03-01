@@ -73,15 +73,15 @@
       const sky = new THREE.Mesh(skyGeometry, skyMaterial);
       scene.add(sky);
 
-      // Terreno orgânico (montanhas)
+      // Terreno orgânico
       const simplex = new SimplexNoise();
-      const terrainGeometry = new THREE.PlaneGeometry(4000, 4000, 200, 200);
+      const terrainGeometry = new THREE.PlaneGeometry(4000, 4000, 100, 100);
       terrainGeometry.rotateX(-Math.PI/2);
       const pos = terrainGeometry.attributes.position;
       for (let i = 0; i < pos.count; i++) {
         const x = pos.getX(i);
         const z = pos.getZ(i);
-        const y = simplex.noise2D(x * 0.001, z * 0.001) * 200; // altura irregular
+        const y = simplex.noise2D(x * 0.001, z * 0.001) * 150; // relevo irregular
         pos.setY(i, y);
       }
       terrainGeometry.computeVertexNormals();
@@ -114,6 +114,26 @@
         spheres.push(s);
       }
 
+      // Lago
+      const waterTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/water.jpg");
+      waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
+      waterTexture.repeat.set(4, 4);
+      const lakeGeometry = new THREE.PlaneGeometry(400, 300);
+      const lakeMaterial = new THREE.MeshPhongMaterial({ map: waterTexture, transparent: true, opacity: 0.8 });
+      const lake = new THREE.Mesh(lakeGeometry, lakeMaterial);
+      lake.rotation.x = -Math.PI/2;
+      lake.position.set(-500, 0, 200);
+      scene.add(lake);
+
+      // Cachoeira
+      const waterfallTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/water.jpg");
+      waterfallTexture.wrapS = waterfallTexture.wrapT = THREE.RepeatWrapping;
+      const waterfallGeometry = new THREE.PlaneGeometry(100, 300);
+      const waterfallMaterial = new THREE.MeshPhongMaterial({ map: waterfallTexture, transparent: true, opacity: 0.7 });
+      const waterfall = new THREE.Mesh(waterfallGeometry, waterfallMaterial);
+      waterfall.position.set(-600, 150, -800);
+      scene.add(waterfall);
+
       // Luz
       scene.add(new THREE.AmbientLight(0x888888));
       const sunLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -128,6 +148,7 @@
           s.position.y = 5 + Math.sin(Date.now() * 0.002 + i) * 2;
         });
         sky.rotation.y += 0.0002;
+        waterfallTexture.offset.y -= 0.01;
         renderer.render(scene, camera);
       }
       animate();
