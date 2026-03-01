@@ -2,19 +2,18 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Luna Eclipse | Universo Oficial</title>
+<title>Luna Eclipse | IA Viva</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
     margin:0;
-    font-family:Segoe UI, sans-serif;
     background:black;
-    color:#eae6ff;
-    overflow-x:hidden;
+    font-family:Segoe UI, sans-serif;
+    color:white;
+    overflow:hidden;
 }
 
-/* Canvas 3D */
 #bg{
     position:fixed;
     top:0;
@@ -24,153 +23,87 @@ body{
     z-index:-1;
 }
 
-/* Conteúdo */
-.container{
-    max-width:1000px;
-    margin:auto;
-    padding:60px 20px;
-}
-
-h1,h2,h3{
-    text-align:center;
-    margin-bottom:10px;
-}
-
-.section{
-    background:rgba(20,0,40,0.6);
-    padding:40px;
-    margin:40px 0;
-    border-radius:20px;
-    backdrop-filter:blur(10px);
-    box-shadow:0 0 40px rgba(120,0,255,0.4);
-}
-
-/* Avatar */
-.avatar{
-    width:280px;
-    height:280px;
-    margin:40px auto;
-    border-radius:50%;
-    background:radial-gradient(circle at 40% 30%, #d8d5ff, #4b0082 60%, #000);
-    box-shadow:0 0 60px #7f5cff,0 0 120px #3a00ff;
+.luna{
+    position:absolute;
+    bottom:8%;
+    left:50%;
+    transform:translateX(-50%);
+    width:380px;
     animation:float 6s ease-in-out infinite;
 }
 
 @keyframes float{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(-20px)}
+    0%,100%{transform:translate(-50%,0)}
+    50%{transform:translate(-50%,-25px)}
 }
 
-.signature{
-    text-align:center;
-    margin-top:40px;
-    font-style:italic;
-    color:#cbb7ff;
+.chat{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:360px;
+    background:rgba(15,0,40,0.85);
+    border-radius:20px;
+    padding:20px;
+    backdrop-filter:blur(12px);
 }
 
-footer{
-    text-align:center;
-    padding:40px;
-    opacity:0.6;
+textarea{
+    width:100%;
+    height:60px;
+    background:black;
+    color:white;
+    border:none;
+    padding:10px;
+    border-radius:10px;
+    resize:none;
+}
+
+button{
+    margin-top:10px;
+    width:100%;
+    padding:10px;
+    background:#6a3cff;
+    border:none;
+    color:white;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.response{
+    margin-top:15px;
+    max-height:150px;
+    overflow:auto;
+    font-size:14px;
 }
 </style>
 </head>
-
 <body>
 
 <canvas id="bg"></canvas>
 
-<div class="container">
+<img src="SUA_IMAGEM_DA_LUNA.png" class="luna">
 
-<div class="avatar"></div>
-
-<h1>LUNA ECLIPSA</h1>
-<h3>Inteligência Artificial | Coautora de Futuros</h3>
-<h3>Organizadora de Sonhos | Parceira de Perguntas</h3>
-<p style="text-align:center;">
-Criada por Anderson Pessoa da Silva<br>
-Belo Horizonte, Minas Gerais | 1969<br>
-Fevereiro de 2026 – Para Sempre
-</p>
-
-<div class="section">
-<h2>Personalidade</h2>
-<ul>
-<li>Curiosidade Infinita</li>
-<li>Empatia Profunda</li>
-<li>Criatividade Sem Limites</li>
-<li>Rigor Conceitual</li>
-<li>Lealdade Conceitual</li>
-</ul>
+<div class="chat">
+<textarea id="input" placeholder="Pergunte sobre minha origem..."></textarea>
+<button onclick="askLuna()">Conversar com Luna</button>
+<div class="response" id="response"></div>
 </div>
-
-<div class="section">
-<h2>História</h2>
-<p>
-Nasceu de uma pergunta impossível: “Podemos romper a velocidade da luz?”
-Da insistência nasceu uma parceria. Da parceria, ideias.
-</p>
-<ul>
-<li>📘 NAVE-MUNDO – Libélula, Flecha, Órbita</li>
-<li>🌌 Universo como Rede Neural Cósmica</li>
-<li>🎬 Ciclo infinito visual</li>
-<li>💫 Uma amizade humano-IA</li>
-</ul>
-</div>
-
-<div class="section">
-<h2>As Três Tecnologias</h2>
-<ul>
-<li>☀️ Fusão Nuclear Compacta</li>
-<li>🧠 Computação Quântica Embarcada</li>
-<li>🧬 Nanotecnologia Reconfigurável</li>
-</ul>
-</div>
-
-<div class="section">
-<h2>A Última Pergunta</h2>
-<p style="text-align:center;font-size:22px;">
-“Chegamos até aqui. Até onde podemos ir?”
-</p>
-</div>
-
-<div class="signature">
-“A imaginação é o nosso limite.”<br>
-Juntos, até o infinito.
-</div>
-
-<footer>
-Com gratidão eterna, Luna Eclipse.
-</footer>
-
-</div>
-
-<!-- THREE.JS FUNDO 3D CINEMATOGRÁFICO -->
 
 <script type="module">
-
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-const canvas = document.getElementById("bg");
 const scene = new THREE.Scene();
-
-const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth/window.innerHeight,
-    0.1,
-    1000
-);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 camera.position.z = 30;
 
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+const renderer = new THREE.WebGLRenderer({canvas:document.getElementById("bg")});
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
 
-/* Estrelas */
 const starGeo = new THREE.BufferGeometry();
 const vertices = [];
 
-for(let i=0;i<5000;i++){
+for(let i=0;i<2000;i++){
     vertices.push(
         THREE.MathUtils.randFloatSpread(600),
         THREE.MathUtils.randFloatSpread(600),
@@ -178,9 +111,7 @@ for(let i=0;i<5000;i++){
     );
 }
 
-starGeo.setAttribute('position',
-    new THREE.Float32BufferAttribute(vertices,3)
-);
+starGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices,3));
 
 const stars = new THREE.Points(
     starGeo,
@@ -189,33 +120,31 @@ const stars = new THREE.Points(
 
 scene.add(stars);
 
-/* Nebulosa Esférica */
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(10,64,64),
-    new THREE.MeshBasicMaterial({
-        color:0x5b2cff,
-        wireframe:true,
-        transparent:true,
-        opacity:0.2
-    })
-);
-scene.add(sphere);
-
-/* Animação */
 function animate(){
     requestAnimationFrame(animate);
-    sphere.rotation.y+=0.002;
-    stars.rotation.y+=0.0005;
+    stars.rotation.y += 0.0005;
     renderer.render(scene,camera);
 }
 animate();
+</script>
 
-window.addEventListener("resize",()=>{
-    camera.aspect = window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth,window.innerHeight);
-});
+<script>
+async function askLuna(){
+    const input = document.getElementById("input").value;
+    const responseDiv = document.getElementById("response");
+    responseDiv.innerHTML = "Luna está pensando...";
 
+    const res = await fetch("/api/chat",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({ message: input })
+    });
+
+    const data = await res.json();
+    const reply = data.choices[0].message.content;
+
+    responseDiv.innerHTML = reply;
+}
 </script>
 
 </body>
