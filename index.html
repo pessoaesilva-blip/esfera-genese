@@ -93,4 +93,50 @@
     scene.add(sphere);
 
     // Aura azul pulsante
-    const auraGeometry = new THREE
+    const auraGeometry = new THREE.SphereGeometry(2.3, 64, 64);
+    const auraMaterial = new THREE.MeshBasicMaterial({
+      color: 0x3399ff,
+      transparent: true,
+      opacity: 0.25
+    });
+    const aura = new THREE.Mesh(auraGeometry, auraMaterial);
+    scene.add(aura);
+
+    // Luz ambiente e direcional
+    const ambientLight = new THREE.AmbientLight(0x555555);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
+
+    camera.position.z = 8;
+
+    // Movimento suave da câmera
+    let angle = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+
+      sphere.rotation.y += 0.002;
+      aura.rotation.y += 0.002;
+
+      // Pulsação da aura
+      const scale = 1 + Math.sin(Date.now() * 0.002) * 0.05;
+      aura.scale.set(scale, scale, scale);
+
+      angle += 0.0005;
+      camera.position.x = Math.sin(angle) * 10;
+      camera.position.z = Math.cos(angle) * 10;
+      camera.lookAt(scene.position);
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
