@@ -7,31 +7,10 @@
     body { margin: 0; background: black; overflow: hidden; font-family: 'Arial', sans-serif; }
     #scene { width: 100%; height: 100%; display: block; }
     canvas { display: block; }
-    /* Joystick para mobile */
-    #joystick {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      width: 100px;
-      height: 100px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 50%;
-      touch-action: none;
-    }
-    #stick {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      background: rgba(255,255,255,0.5);
-      border-radius: 50%;
-      top: 30px;
-      left: 30px;
-    }
   </style>
 </head>
 <body>
   <canvas id="scene"></canvas>
-  <div id="joystick"><div id="stick"></div></div>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/PointerLockControls.js"></script>
@@ -57,8 +36,14 @@
     dome.position.y = 250;
     scene.add(dome);
 
-    // Luzes
-    scene.add(new THREE.AmbientLight(0x888888, 1.2));
+    // Luzes principais
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(200, 300, 200);
+    scene.add(dirLight);
+
     const domeLight = new THREE.PointLight(0x3399ff, 0.6, 1000);
     domeLight.position.set(0, 250, 0);
     scene.add(domeLight);
@@ -97,70 +82,4 @@
       const angle = (i / 12) * Math.PI * 2;
       const x = Math.cos(angle) * 60;
       const z = Math.sin(angle) * 60;
-      const s = new THREE.Mesh(new THREE.SphereGeometry(5, 16, 16), new THREE.MeshPhongMaterial({ color: 0xffffff }));
-      s.position.set(x, 70, z);
-      scene.add(s);
-      spheres.push(s);
-    }
-
-    // Controles em primeira pessoa (PC)
-    const controls = new THREE.PointerLockControls(camera, document.body);
-    document.body.addEventListener('click', () => controls.lock());
-    scene.add(controls.getObject());
-
-    let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-    const velocity = new THREE.Vector3();
-    const direction = new THREE.Vector3();
-
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'KeyW') moveForward = true;
-      if (e.code === 'KeyS') moveBackward = true;
-      if (e.code === 'KeyA') moveLeft = true;
-      if (e.code === 'KeyD') moveRight = true;
-    });
-    document.addEventListener('keyup', (e) => {
-      if (e.code === 'KeyW') moveForward = false;
-      if (e.code === 'KeyS') moveBackward = false;
-      if (e.code === 'KeyA') moveLeft = false;
-      if (e.code === 'KeyD') moveRight = false;
-    });
-
-    camera.position.set(0, 100, 200);
-
-    // Sons ambiente
-    const listener = new THREE.AudioListener();
-    camera.add(listener);
-    const audioLoader = new THREE.AudioLoader();
-
-    const soundCosmic = new THREE.Audio(listener);
-    audioLoader.load('https://cdn.pixabay.com/download/audio/2022/03/15/audio_3b9f0b.mp3?filename=ambient-space-110397.mp3', function(buffer) {
-      soundCosmic.setBuffer(buffer);
-      soundCosmic.setLoop(true);
-      soundCosmic.setVolume(0.4);
-      soundCosmic.play();
-    });
-
-    const soundMetal = new THREE.Audio(listener);
-    audioLoader.load('https://cdn.pixabay.com/download/audio/2022/03/15/audio_3b9f0b.mp3?filename=metal-hit-110398.mp3', function(buffer) {
-      soundMetal.setBuffer(buffer);
-      soundMetal.setLoop(true);
-      soundMetal.setVolume(0.2);
-      soundMetal.play();
-    });
-
-    // Joystick para mobile
-    const joystick = document.getElementById("joystick");
-    const stick = document.getElementById("stick");
-    let dragging = false;
-
-    joystick.addEventListener("touchstart", (e) => { dragging = true; });
-    joystick.addEventListener("touchend", (e) => { dragging = false; stick.style.top="30px"; stick.style.left="30px"; moveForward=moveBackward=moveLeft=moveRight=false; });
-    joystick.addEventListener("touchmove", (e) => {
-      if (!dragging) return;
-      const rect = joystick.getBoundingClientRect();
-      const touch = e.touches[0];
-      const x = touch.clientX - rect.left - 50;
-      const y = touch.clientY - rect.top - 50;
-      stick.style.left = (x+50-20)+"px";
-      stick.style.top = (y+50-20)+"px";
-      moveForward = y
+      const s = new THREE.Mesh(new THREE.SphereGeometry(5, 16, 16), new THREE.Mesh
