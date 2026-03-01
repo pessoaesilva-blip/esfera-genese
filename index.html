@@ -69,7 +69,7 @@
 
     // Fundo estelar (estrelas mais próximas)
     const starGeometry = new THREE.BufferGeometry();
-    const starCount = 2000;
+    const starCount = 2500;
     const starVertices = [];
     for (let i = 0; i < starCount; i++) {
       const x = (Math.random() - 0.5) * 2000;
@@ -82,27 +82,27 @@
     const stars = new THREE.Points(starGeometry, starMaterial);
     scene.add(stars);
 
-    // Esfera opaca azulada
+    // Esfera verde opaca
     const sphereGeometry = new THREE.SphereGeometry(2, 64, 64);
     const sphereMaterial = new THREE.MeshPhongMaterial({
-      color: 0x3366cc,
-      shininess: 100
+      color: 0x228B22, // verde
+      shininess: 80
     });
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     scene.add(sphere);
 
-    // Aura de luz branca (glow)
-    const auraGeometry = new THREE.SphereGeometry(2.5, 64, 64);
+    // Aura menor azul
+    const auraGeometry = new THREE.SphereGeometry(2.3, 64, 64);
     const auraMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
+      color: 0x3399ff, // azul
       transparent: true,
-      opacity: 0.2
+      opacity: 0.25
     });
     const aura = new THREE.Mesh(auraGeometry, auraMaterial);
     scene.add(aura);
 
     // Luz ambiente e direcional
-    const ambientLight = new THREE.AmbientLight(0x888888);
+    const ambientLight = new THREE.AmbientLight(0x555555);
     scene.add(ambientLight);
     const pointLight = new THREE.PointLight(0xffffff, 1, 100);
     pointLight.position.set(10, 10, 10);
@@ -130,8 +130,4 @@
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  </script>
-</body>
-</html>
+      renderer.setSize(window.innerWidth, window.inner
