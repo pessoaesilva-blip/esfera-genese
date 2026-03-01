@@ -62,62 +62,64 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
     const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Estrelas
+    // Fundo estelar
     const starGeometry = new THREE.BufferGeometry();
-    const starCount = 2000;
+    const starCount = 3000;
     const starVertices = [];
     for (let i = 0; i < starCount; i++) {
-      const x = (Math.random() - 0.5) * 2000;
-      const y = (Math.random() - 0.5) * 2000;
-      const z = (Math.random() - 0.5) * 2000;
+      const x = (Math.random() - 0.5) * 4000;
+      const y = (Math.random() - 0.5) * 4000;
+      const z = (Math.random() - 0.5) * 4000;
       starVertices.push(x, y, z);
     }
     starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-    const starMaterial = new THREE.PointsMaterial({color: 0xffffff});
+    const starMaterial = new THREE.PointsMaterial({color: 0xffffff, size: 1});
     const stars = new THREE.Points(starGeometry, starMaterial);
     scene.add(stars);
 
-    // Esfera
+    // Esfera translúcida azul
     const sphereGeometry = new THREE.SphereGeometry(2, 64, 64);
     const sphereMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x88ccff,
+      color: 0x3399ff,
       transparent: true,
-      opacity: 0.3,
-      roughness: 0.1,
-      metalness: 0.5,
+      opacity: 0.4,
+      roughness: 0.2,
+      metalness: 0.3,
       reflectivity: 1.0,
       clearcoat: 1.0
     });
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     scene.add(sphere);
 
-    // Nebulosas
+    // Nebulosas e galáxias simuladas
     function createNebula(color, size, position) {
       const nebulaGeometry = new THREE.SphereGeometry(size, 32, 32);
       const nebulaMaterial = new THREE.MeshBasicMaterial({
         color: color,
         transparent: true,
-        opacity: 0.2
+        opacity: 0.15
       });
       const nebula = new THREE.Mesh(nebulaGeometry, nebulaMaterial);
       nebula.position.set(...position);
       scene.add(nebula);
     }
-    createNebula(0xff66cc, 50, [100, 50, -200]);
-    createNebula(0x66ffcc, 70, [-150, -80, -300]);
-    createNebula(0xccccff, 60, [200, -100, -400]);
 
-    camera.position.z = 5;
+    createNebula(0xff66cc, 80, [200, 100, -600]);
+    createNebula(0x66ffcc, 120, [-300, -150, -800]);
+    createNebula(0xccccff, 100, [400, -200, -1000]);
+    createNebula(0xffff99, 150, [-500, 300, -1200]);
+
+    camera.position.z = 6;
 
     function animate() {
       requestAnimationFrame(animate);
       sphere.rotation.y += 0.002;
-      stars.rotation.y += 0.0005;
+      stars.rotation.y += 0.0003;
       renderer.render(scene, camera);
     }
     animate();
