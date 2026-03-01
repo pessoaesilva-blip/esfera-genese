@@ -2,145 +2,120 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Entrada - Universo</title>
+  <title>Gênese</title>
   <style>
     body {
       margin: 0;
-      overflow: hidden;
       background: black;
+      overflow: hidden;
       font-family: 'Arial', sans-serif;
     }
-    canvas {
-      display: block;
-    }
-    .overlay {
+    .genese-text {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      text-align: center;
+      font-size: 2em;
       color: #ffffff;
+      text-align: center;
+      opacity: 1;
+      animation: smokeFade 20s forwards;
     }
-    .welcome-text {
-      font-size: 1.2em; /* menor para caber dentro da esfera */
-      margin-bottom: 15px;
-      animation: fadeGlow 4s ease-in-out infinite alternate;
+    @keyframes smokeFade {
+      0% { opacity: 1; filter: blur(0px); }
+      50% { opacity: 0.7; filter: blur(4px); }
+      100% { opacity: 0; filter: blur(10px); }
     }
-    .link-genese {
-      color: #88ccff;
-      font-size: 1.1em;
-      text-decoration: none;
-      border: 2px solid #88ccff;
-      padding: 6px 14px;
-      border-radius: 8px;
-      transition: all 0.5s ease;
-    }
-    .link-genese:hover {
-      background: #88ccff;
-      color: black;
-      box-shadow: 0 0 20px #88ccff;
-    }
-    @keyframes fadeGlow {
-      from {
-        opacity: 0.4;
-        text-shadow: 0 0 10px #88ccff, 0 0 20px #88ccff;
-      }
-      to {
-        opacity: 1;
-        text-shadow: 0 0 20px #ffffff, 0 0 40px #88ccff, 0 0 60px #88ccff;
-      }
-    }
-    @keyframes pulseAura {
-      0% { opacity: 0.15; scale: 1; }
-      50% { opacity: 0.35; scale: 1.05; }
-      100% { opacity: 0.15; scale: 1; }
+    canvas {
+      display: none; /* escondido até ativar o cenário */
     }
   </style>
 </head>
 <body>
-  <div class="overlay">
-    <div class="welcome-text">Bem-vindo ao Universo</div>
-    <a href="genese.html" class="link-genese">Entrar na Gênese</a>
+  <div class="genese-text">
+    No princípio, havia apenas o vazio.<br>
+    Da escuridão nasceu a luz.<br>
+    E da luz, o cosmos começou a se formar.<br>
+    Esta é a Gênese do Universo.
   </div>
 
   <!-- Three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 4000);
-    const renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    // Após 20 segundos, esconder texto e mostrar cenário
+    setTimeout(() => {
+      document.querySelector(".genese-text").style.display = "none";
+      iniciarCenario();
+    }, 20000);
 
-    // Fundo estelar (mais próximo)
-    const starGeometry = new THREE.BufferGeometry();
-    const starCount = 2500;
-    const starVertices = [];
-    for (let i = 0; i < starCount; i++) {
-      const x = (Math.random() - 0.5) * 1500;
-      const y = (Math.random() - 0.5) * 1500;
-      const z = (Math.random() - 0.5) * 1500;
-      starVertices.push(x, y, z);
-    }
-    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-    const starMaterial = new THREE.PointsMaterial({color: 0xffffff, size: 1.2});
-    const stars = new THREE.Points(starGeometry, starMaterial);
-    scene.add(stars);
-
-    // Esfera verde opaca
-    const sphereGeometry = new THREE.SphereGeometry(2, 64, 64);
-    const sphereMaterial = new THREE.MeshPhongMaterial({
-      color: 0x228B22, // verde
-      shininess: 80
-    });
-    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    scene.add(sphere);
-
-    // Aura azul menor com pulsação
-    const auraGeometry = new THREE.SphereGeometry(2.3, 64, 64);
-    const auraMaterial = new THREE.MeshBasicMaterial({
-      color: 0x3399ff, // azul
-      transparent: true,
-      opacity: 0.25
-    });
-    const aura = new THREE.Mesh(auraGeometry, auraMaterial);
-    scene.add(aura);
-
-    // Luz ambiente e direcional
-    const ambientLight = new THREE.AmbientLight(0x555555);
-    scene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-    pointLight.position.set(10, 10, 10);
-    scene.add(pointLight);
-
-    camera.position.z = 8;
-
-    // Movimento suave da câmera
-    let angle = 0;
-    function animate() {
-      requestAnimationFrame(animate);
-
-      sphere.rotation.y += 0.002;
-      aura.rotation.y += 0.002;
-
-      // Pulsação da aura
-      const scale = 1 + Math.sin(Date.now() * 0.002) * 0.05;
-      aura.scale.set(scale, scale, scale);
-
-      angle += 0.0005;
-      camera.position.x = Math.sin(angle) * 10;
-      camera.position.z = Math.cos(angle) * 10;
-      camera.lookAt(scene.position);
-
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
+    function iniciarCenario() {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 5000);
+      const renderer = new THREE.WebGLRenderer({antialias: true});
       renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+      document.body.appendChild(renderer.domElement);
+      document.querySelector("canvas").style.display = "block";
+
+      // Plano gramado
+      const grassTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/grasslight-big.jpg");
+      grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
+      grassTexture.repeat.set(50, 50);
+      const planeGeometry = new THREE.PlaneGeometry(2000, 2000);
+      const planeMaterial = new THREE.MeshLambertMaterial({map: grassTexture});
+      const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      plane.rotation.x = -Math.PI/2;
+      scene.add(plane);
+
+      // Fonte de luz central (entidade IA futura)
+      const entityGeometry = new THREE.SphereGeometry(5, 64, 64);
+      const entityMaterial = new THREE.MeshBasicMaterial({
+        color: 0x88ccff,
+        transparent: true,
+        opacity: 0.6
+      });
+      const entity = new THREE.Mesh(entityGeometry, entityMaterial);
+      entity.position.set(0, 5, 0);
+      scene.add(entity);
+
+      // 12 esferas flutuando ao redor
+      const spheres = [];
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2;
+        const x = Math.cos(angle) * 30;
+        const z = Math.sin(angle) * 30;
+        const sphereGeo = new THREE.SphereGeometry(2, 32, 32);
+        const sphereMat = new THREE.MeshPhongMaterial({color: 0xffffff});
+        const s = new THREE.Mesh(sphereGeo, sphereMat);
+        s.position.set(x, 5, z);
+        scene.add(s);
+        spheres.push(s);
+      }
+
+      // Luz ambiente e direcional
+      const ambientLight = new THREE.AmbientLight(0x888888);
+      scene.add(ambientLight);
+      const sunLight = new THREE.DirectionalLight(0xffffff, 1);
+      sunLight.position.set(100, 200, 100);
+      scene.add(sunLight);
+
+      camera.position.set(0, 50, 100);
+
+      // Animação
+      function animate() {
+        requestAnimationFrame(animate);
+        spheres.forEach((s, i) => {
+          s.position.y = 5 + Math.sin(Date.now() * 0.002 + i) * 2;
+        });
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
   </script>
 </body>
 </html>
