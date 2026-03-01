@@ -80,7 +80,7 @@
       scene.add(room);
 
       // Cúpula azul com mapa estelar
-      const starsTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/planets/starfield.png");
+      const starsTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/cube/skybox/px.jpg");
       const domeGeometry = new THREE.SphereGeometry(500, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
       const domeMaterial = new THREE.MeshPhongMaterial({
         color: 0x3399ff,
@@ -99,7 +99,7 @@
       scene.add(domeLight);
 
       // Praça central com símbolos antigos
-      const symbolsTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/uv_grid_opengl.jpg");
+      const symbolsTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/uv_grid_sm.jpg");
       const plazaGeometry = new THREE.CircleGeometry(120, 64);
       const plazaMaterial = new THREE.MeshPhongMaterial({
         map: symbolsTexture,
