@@ -1,22 +1,56 @@
-<script>
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
-  const renderer = new THREE.WebGLRenderer({canvas: document.getElementById("scene")});
-  renderer.setSize(window.innerWidth, window.innerHeight);
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste Gênese</title>
+  <style>
+    body { margin: 0; background: black; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script>
+    // Cena, câmera e renderizador
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-  const cube = new THREE.Mesh(new THREE.BoxGeometry(50,50,50), new THREE.MeshPhongMaterial({color:0x00ff00}));
-  scene.add(cube);
+    // Cubo simples para teste
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
 
-  const light = new THREE.AmbientLight(0xffffff, 2);
-  scene.add(light);
+    // Luz ambiente
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+    scene.add(ambientLight);
 
-  camera.position.set(0,100,200);
-  camera.lookAt(0,0,0);
+    // Luz direcional
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(5, 10, 7.5);
+    scene.add(dirLight);
 
-  function animate(){
-    requestAnimationFrame(animate);
-    cube.rotation.y += 0.01;
-    renderer.render(scene,camera);
-  }
-  animate();
-</script>
+    // Posição da câmera
+    camera.position.z = 5;
+
+    // Loop de animação
+    function animate() {
+      requestAnimationFrame(animate);
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Ajuste responsivo
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
