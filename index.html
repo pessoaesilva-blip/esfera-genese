@@ -22,6 +22,7 @@
       text-align: center;
       opacity: 1;
       animation: smokeFade 15s forwards;
+      z-index: 10;
     }
 
     @keyframes smokeFade {
@@ -44,6 +45,9 @@
     Esta é a Gênese do Universo.
   </div>
 
+  <!-- Canvas já presente no HTML -->
+  <canvas id="scene"></canvas>
+
   <!-- Three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
@@ -54,12 +58,13 @@
     }, 15000);
 
     function iniciarCenario() {
+      const canvas = document.getElementById("scene");
+      canvas.style.display = "block";
+
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 5000);
-      const renderer = new THREE.WebGLRenderer({antialias: true});
+      const renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
       renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
-      document.querySelector("canvas").style.display = "block";
 
       // Plano gramado
       const grassTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/grasslight-big.jpg");
@@ -71,7 +76,7 @@
       plane.rotation.x = -Math.PI/2;
       scene.add(plane);
 
-      // Fonte de luz central (entidade IA futura)
+      // Entidade luminosa central
       const entityGeometry = new THREE.SphereGeometry(5, 64, 64);
       const entityMaterial = new THREE.MeshBasicMaterial({
         color: 0x88ccff,
