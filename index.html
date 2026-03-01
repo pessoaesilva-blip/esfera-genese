@@ -15,11 +15,11 @@
     }
     .welcome-text {
       position: absolute;
-      top: 40%;
+      top: 45%;
       left: 50%;
       transform: translate(-50%, -50%);
       color: #ffffff;
-      font-size: 3em;
+      font-size: 1.8em; /* menor */
       text-align: center;
       animation: fadeGlow 4s ease-in-out infinite alternate;
       pointer-events: none;
@@ -30,10 +30,10 @@
       left: 50%;
       transform: translate(-50%, -50%);
       color: #88ccff;
-      font-size: 1.5em;
+      font-size: 1.2em;
       text-decoration: none;
       border: 2px solid #88ccff;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 10px;
       transition: all 0.5s ease;
     }
@@ -67,46 +67,57 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Fundo estelar
+    // Fundo estelar (estrelas mais próximas)
     const starGeometry = new THREE.BufferGeometry();
-    const starCount = 4000;
+    const starCount = 2000;
     const starVertices = [];
     for (let i = 0; i < starCount; i++) {
-      const x = (Math.random() - 0.5) * 6000;
-      const y = (Math.random() - 0.5) * 6000;
-      const z = (Math.random() - 0.5) * 6000;
+      const x = (Math.random() - 0.5) * 2000;
+      const y = (Math.random() - 0.5) * 2000;
+      const z = (Math.random() - 0.5) * 2000;
       starVertices.push(x, y, z);
     }
     starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-    const starMaterial = new THREE.PointsMaterial({color: 0xffffff, size: 1});
+    const starMaterial = new THREE.PointsMaterial({color: 0xffffff, size: 1.2});
     const stars = new THREE.Points(starGeometry, starMaterial);
     scene.add(stars);
 
-    // Esfera translúcida azul
+    // Esfera opaca azulada
     const sphereGeometry = new THREE.SphereGeometry(2, 64, 64);
-    const sphereMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x3399ff,
-      transparent: true,
-      opacity: 0.4,
-      roughness: 0.2,
-      metalness: 0.3,
-      reflectivity: 1.0,
-      clearcoat: 1.0
+    const sphereMaterial = new THREE.MeshPhongMaterial({
+      color: 0x3366cc,
+      shininess: 100
     });
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     scene.add(sphere);
 
+    // Aura de luz branca (glow)
+    const auraGeometry = new THREE.SphereGeometry(2.5, 64, 64);
+    const auraMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.2
+    });
+    const aura = new THREE.Mesh(auraGeometry, auraMaterial);
+    scene.add(aura);
+
+    // Luz ambiente e direcional
+    const ambientLight = new THREE.AmbientLight(0x888888);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
+
     camera.position.z = 8;
 
-    // Efeito de movimento lento da câmera (como viagem pelo espaço)
+    // Movimento suave da câmera
     let angle = 0;
     function animate() {
       requestAnimationFrame(animate);
 
-      // Rotação da esfera
       sphere.rotation.y += 0.002;
+      aura.rotation.y += 0.002;
 
-      // Movimento suave da câmera em órbita
       angle += 0.0005;
       camera.position.x = Math.sin(angle) * 10;
       camera.position.z = Math.cos(angle) * 10;
