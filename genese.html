@@ -1,51 +1,142 @@
-// Piso metálico antigo
-const floorTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/metal.jpg");
-floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-floorTexture.repeat.set(10, 10);
-const roomMaterial = new THREE.MeshPhongMaterial({
-  map: floorTexture,
-  side: THREE.BackSide,
-  shininess: 10
-});
-const roomGeometry = new THREE.BoxGeometry(1000, 500, 1000);
-const room = new THREE.Mesh(roomGeometry, roomMaterial);
-scene.add(room);
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gênese</title>
+  <style>
+    body { margin: 0; background: black; overflow: hidden; font-family: 'Arial', sans-serif; }
+    .genese-text {
+      position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 2em; color: #ffffff; text-align: center; z-index: 10;
+    }
+    .progress-container {
+      position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%);
+      width: 300px; height: 20px; background: #333; border-radius: 10px;
+      overflow: hidden; display: none;
+    }
+    .progress-bar {
+      height: 100%; width: 0%; background: linear-gradient(90deg, #88ccff, #ffffff);
+      transition: width 0.2s;
+    }
+    #scene { width: 100%; height: 100%; display: none; }
+  </style>
+</head>
+<body>
+  <div class="genese-text" id="texto">
+    No princípio, havia apenas o vazio.<br>
+    Da escuridão nasceu a luz.<br>
+    E da luz, o cosmos começou a se formar.<br>
+    Esta é a Gênese do Universo.
+  </div>
+  <div class="progress-container" id="progress-container">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+  <canvas id="scene"></canvas>
 
-// Cúpula azul com iluminação
-const domeGeometry = new THREE.SphereGeometry(500, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
-const domeMaterial = new THREE.MeshPhongMaterial({
-  color: 0x3399ff,
-  transparent: true,
-  opacity: 0.4,
-  emissive: 0x224488
-});
-const dome = new THREE.Mesh(domeGeometry, domeMaterial);
-dome.position.y = 250;
-scene.add(dome);
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script>
+    const texto = document.getElementById("texto");
+    const progressContainer = document.getElementById("progress-container");
+    const progressBar = document.getElementById("progress");
+    const duration = 15000;
 
-// Luz azul suave da cúpula
-const domeLight = new THREE.PointLight(0x3399ff, 0.5, 1000);
-domeLight.position.set(0, 250, 0);
-scene.add(domeLight);
+    setTimeout(() => {
+      progressContainer.style.display = "block";
+      let startTime = Date.now();
+      function updateProgress() {
+        let elapsed = Date.now() - startTime;
+        let percent = Math.min((elapsed / duration) * 100, 100);
+        progressBar.style.width = percent + "%";
+        if (elapsed < duration) requestAnimationFrame(updateProgress);
+        else {
+          texto.style.display = "none";
+          progressContainer.style.display = "none";
+          iniciarCenario();
+        }
+      }
+      updateProgress();
+    }, 15000);
 
-// Praça central em pedra
-const plazaTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/stone.jpg");
-const plazaGeometry = new THREE.CircleGeometry(120, 32);
-const plazaMaterial = new THREE.MeshLambertMaterial({ map: plazaTexture });
-const plaza = new THREE.Mesh(plazaGeometry, plazaMaterial);
-plaza.rotation.x = -Math.PI/2;
-scene.add(plaza);
+    function iniciarCenario() {
+      const canvas = document.getElementById("scene");
+      canvas.style.display = "block";
 
-// Bancos mais detalhados
-for (let i = 0; i < 4; i++) {
-  const benchSeat = new THREE.Mesh(new THREE.BoxGeometry(60, 5, 20), new THREE.MeshLambertMaterial({ color: 0x999999 }));
-  const benchLeg1 = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 10, 8), new THREE.MeshLambertMaterial({ color: 0x555555 }));
-  const benchLeg2 = benchLeg1.clone();
-  benchSeat.add(benchLeg1);
-  benchSeat.add(benchLeg2);
-  benchLeg1.position.set(-25, -5, 0);
-  benchLeg2.position.set(25, -5, 0);
-  const angle = (i / 4) * Math.PI * 2;
-  benchSeat.position.set(Math.cos(angle) * 150, 5, Math.sin(angle) * 150);
-  scene.add(benchSeat);
-}
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+      const renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      // Sala metálica antiga
+      const floorTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/metal.jpg");
+      floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+      floorTexture.repeat.set(10, 10);
+      const roomMaterial = new THREE.MeshPhongMaterial({
+        map: floorTexture,
+        side: THREE.BackSide,
+        shininess: 5
+      });
+      const roomGeometry = new THREE.BoxGeometry(1000, 500, 1000);
+      const room = new THREE.Mesh(roomGeometry, roomMaterial);
+      scene.add(room);
+
+      // Cúpula azul com mapa estelar
+      const starsTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg");
+      const domeGeometry = new THREE.SphereGeometry(500, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
+      const domeMaterial = new THREE.MeshPhongMaterial({
+        color: 0x3399ff,
+        transparent: true,
+        opacity: 0.4,
+        emissive: 0x224488,
+        emissiveMap: starsTexture
+      });
+      const dome = new THREE.Mesh(domeGeometry, domeMaterial);
+      dome.position.y = 250;
+      scene.add(dome);
+
+      // Luz azul suave da cúpula
+      const domeLight = new THREE.PointLight(0x3399ff, 0.6, 1000);
+      domeLight.position.set(0, 250, 0);
+      scene.add(domeLight);
+
+      // Praça central com símbolos antigos
+      const symbolsTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/uv_grid_opengl.jpg");
+      const plazaGeometry = new THREE.CircleGeometry(120, 64);
+      const plazaMaterial = new THREE.MeshPhongMaterial({
+        map: symbolsTexture,
+        emissive: 0x222222,
+        emissiveIntensity: 0.5
+      });
+      const plaza = new THREE.Mesh(plazaGeometry, plazaMaterial);
+      plaza.rotation.x = -Math.PI/2;
+      scene.add(plaza);
+
+      // Bancos detalhados
+      for (let i = 0; i < 4; i++) {
+        const benchSeat = new THREE.Mesh(new THREE.BoxGeometry(60, 5, 20), new THREE.MeshLambertMaterial({ color: 0x999999 }));
+        const benchLeg1 = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 10, 8), new THREE.MeshLambertMaterial({ color: 0x555555 }));
+        const benchLeg2 = benchLeg1.clone();
+        benchSeat.add(benchLeg1);
+        benchSeat.add(benchLeg2);
+        benchLeg1.position.set(-25, -5, 0);
+        benchLeg2.position.set(25, -5, 0);
+        const angle = (i / 4) * Math.PI * 2;
+        benchSeat.position.set(Math.cos(angle) * 150, 5, Math.sin(angle) * 150);
+        scene.add(benchSeat);
+      }
+
+      // Entidade luminosa
+      const entityGeometry = new THREE.SphereGeometry(10, 32, 32);
+      const entityMaterial = new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.7 });
+      const entity = new THREE.Mesh(entityGeometry, entityMaterial);
+      entity.position.set(0, 20, 0);
+      scene.add(entity);
+
+      // 12 esferas flutuantes
+      const spheres = [];
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2;
+        const x = Math.cos(angle) * 60;
+        const z = Math.sin(angle) * 60;
+        const sphereGeo = new THREE.SphereGeometry(5, 16, 16);
+        const sphereMat = new THREE.MeshPhongMaterial({ color: 0xffffff });
+        const s = new THREE.Mesh(sphereGeo,
