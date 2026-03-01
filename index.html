@@ -1,165 +1,132 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Esfera Gênese</title>
-<style>
-    body { margin:0; overflow:hidden; background:black; }
-</style>
+  <meta charset="UTF-8">
+  <title>Entrada - Universo</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+      font-family: 'Arial', sans-serif;
+    }
+    canvas {
+      display: block;
+    }
+    .welcome-text {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ffffff;
+      font-size: 3em;
+      text-align: center;
+      animation: fadeGlow 4s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .link-genese {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #88ccff;
+      font-size: 1.5em;
+      text-decoration: none;
+      border: 2px solid #88ccff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      transition: all 0.5s ease;
+    }
+    .link-genese:hover {
+      background: #88ccff;
+      color: black;
+      box-shadow: 0 0 20px #88ccff;
+    }
+    @keyframes fadeGlow {
+      from {
+        opacity: 0.3;
+        text-shadow: 0 0 10px #88ccff, 0 0 20px #88ccff;
+      }
+      to {
+        opacity: 1;
+        text-shadow: 0 0 20px #ffffff, 0 0 40px #88ccff, 0 0 60px #88ccff;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="welcome-text">Bem-vindo ao Universo</div>
+  <a href="genese.html" class="link-genese">Entrar na Gênese</a>
 
-<script type="module">
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { EffectComposer } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+    // Estrelas
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 2000;
+    const starVertices = [];
+    for (let i = 0; i < starCount; i++) {
+      const x = (Math.random() - 0.5) * 2000;
+      const y = (Math.random() - 0.5) * 2000;
+      const z = (Math.random() - 0.5) * 2000;
+      starVertices.push(x, y, z);
+    }
+    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+    const starMaterial = new THREE.PointsMaterial({color: 0xffffff});
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
 
-// ================= CENA =================
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
+    // Esfera
+    const sphereGeometry = new THREE.SphereGeometry(2, 64, 64);
+    const sphereMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x88ccff,
+      transparent: true,
+      opacity: 0.3,
+      roughness: 0.1,
+      metalness: 0.5,
+      reflectivity: 1.0,
+      clearcoat: 1.0
+    });
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    scene.add(sphere);
 
-// ================= CAMERA =================
-const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth/window.innerHeight,
-    0.1,
-    1000
-);
-camera.position.set(0, 5, 20);
+    // Nebulosas
+    function createNebula(color, size, position) {
+      const nebulaGeometry = new THREE.SphereGeometry(size, 32, 32);
+      const nebulaMaterial = new THREE.MeshBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.2
+      });
+      const nebula = new THREE.Mesh(nebulaGeometry, nebulaMaterial);
+      nebula.position.set(...position);
+      scene.add(nebula);
+    }
+    createNebula(0xff66cc, 50, [100, 50, -200]);
+    createNebula(0x66ffcc, 70, [-150, -80, -300]);
+    createNebula(0xccccff, 60, [200, -100, -400]);
 
-// ================= RENDER =================
-const renderer = new THREE.WebGLRenderer({ antialias:true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1;
-document.body.appendChild(renderer.domElement);
+    camera.position.z = 5;
 
-// ================= CONTROLES =================
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+    function animate() {
+      requestAnimationFrame(animate);
+      sphere.rotation.y += 0.002;
+      stars.rotation.y += 0.0005;
+      renderer.render(scene, camera);
+    }
+    animate();
 
-// ================= LUZ =================
-const sun = new THREE.DirectionalLight(0xffffff, 2);
-sun.position.set(10,20,10);
-scene.add(sun);
-
-scene.add(new THREE.AmbientLight(0xffffff,0.5));
-
-// ================= SOLO =================
-const ground = new THREE.Mesh(
-    new THREE.CircleGeometry(200,64),
-    new THREE.MeshStandardMaterial({ color:0x0f3d0f })
-);
-ground.rotation.x = -Math.PI/2;
-scene.add(ground);
-
-// ================= ESTRELAS =================
-const starGeo = new THREE.BufferGeometry();
-const vertices = [];
-
-for(let i=0;i<3000;i++){
-    vertices.push(
-        THREE.MathUtils.randFloatSpread(400),
-        THREE.MathUtils.randFloatSpread(400),
-        THREE.MathUtils.randFloatSpread(400)
-    );
-}
-
-starGeo.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(vertices,3)
-);
-
-const stars = new THREE.Points(
-    starGeo,
-    new THREE.PointsMaterial({ color:0xffffff, size:0.7 })
-);
-
-scene.add(stars);
-
-// ================= ESFERA =================
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(6,64,64),
-    new THREE.MeshStandardMaterial({
-        color:0x222222,
-        metalness:0.8,
-        roughness:0.3
-    })
-);
-scene.add(sphere);
-
-// ================= RELÓGIO =================
-const clockCanvas = document.createElement("canvas");
-clockCanvas.width = 512;
-clockCanvas.height = 256;
-const ctx = clockCanvas.getContext("2d");
-
-const texture = new THREE.CanvasTexture(clockCanvas);
-
-const clockMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.5,2),
-    new THREE.MeshBasicMaterial({ map:texture, transparent:true })
-);
-
-clockMesh.position.set(0,0,6.1);
-scene.add(clockMesh);
-
-function updateClock(){
-    const time = new Date().toLocaleTimeString();
-    ctx.fillStyle="black";
-    ctx.fillRect(0,0,512,256);
-    ctx.fillStyle="#00ffff";
-    ctx.font="bold 90px Arial";
-    ctx.textAlign="center";
-    ctx.fillText(time,256,160);
-    texture.needsUpdate=true;
-}
-setInterval(updateClock,1000);
-updateClock();
-
-// ================= BLOOM =================
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene,camera));
-
-const bloom = new UnrealBloomPass(
-    new THREE.Vector2(window.innerWidth,window.innerHeight),
-    1.2,0.4,0.85
-);
-composer.addPass(bloom);
-
-// ================= ANIMAÇÃO =================
-let angle=0;
-
-function animate(){
-    requestAnimationFrame(animate);
-
-    angle+=0.002;
-    sun.position.set(
-        Math.sin(angle)*50,
-        30,
-        Math.cos(angle)*50
-    );
-
-    sphere.rotation.y+=0.003;
-
-    controls.update();
-    composer.render();
-}
-
-animate();
-
-// ================= RESPONSIVO =================
-window.addEventListener("resize",()=>{
-    camera.aspect = window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth,window.innerHeight);
-    composer.setSize(window.innerWidth,window.innerHeight);
-});
-
-</script>
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>
