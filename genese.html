@@ -4,45 +4,21 @@
   <meta charset="UTF-8">
   <title>Gênese</title>
   <style>
-    body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-      font-family: 'Arial', sans-serif;
-    }
+    body { margin: 0; background: black; overflow: hidden; font-family: 'Arial', sans-serif; }
     .genese-text {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2em;
-      color: #ffffff;
-      text-align: center;
-      z-index: 10;
+      position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 2em; color: #ffffff; text-align: center; z-index: 10;
     }
     .progress-container {
-      position: absolute;
-      bottom: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 300px;
-      height: 20px;
-      background: #333;
-      border-radius: 10px;
-      overflow: hidden;
-      display: none;
+      position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%);
+      width: 300px; height: 20px; background: #333; border-radius: 10px;
+      overflow: hidden; display: none;
     }
     .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #88ccff, #ffffff);
+      height: 100%; width: 0%; background: linear-gradient(90deg, #88ccff, #ffffff);
       transition: width 0.2s;
     }
-    #scene {
-      width: 100%;
-      height: 100%;
-      display: none;
-    }
+    #scene { width: 100%; height: 100%; display: none; }
   </style>
 </head>
 <body>
@@ -52,32 +28,28 @@
     E da luz, o cosmos começou a se formar.<br>
     Esta é a Gênese do Universo.
   </div>
-
   <div class="progress-container" id="progress-container">
     <div class="progress-bar" id="progress"></div>
   </div>
-
   <canvas id="scene"></canvas>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/simplex-noise/dist/esm/simplex-noise.min.js"></script>
   <script>
     const texto = document.getElementById("texto");
     const progressContainer = document.getElementById("progress-container");
     const progressBar = document.getElementById("progress");
     const duration = 15000;
 
-    // Primeiro: esperar 15 segundos só com o texto
     setTimeout(() => {
       progressContainer.style.display = "block";
       let startTime = Date.now();
-
       function updateProgress() {
         let elapsed = Date.now() - startTime;
         let percent = Math.min((elapsed / duration) * 100, 100);
         progressBar.style.width = percent + "%";
-        if (elapsed < duration) {
-          requestAnimationFrame(updateProgress);
-        } else {
+        if (elapsed < duration) requestAnimationFrame(updateProgress);
+        else {
           texto.style.display = "none";
           progressContainer.style.display = "none";
           iniciarCenario();
@@ -97,39 +69,33 @@
 
       // Céu
       const skyGeometry = new THREE.SphereGeometry(3000, 32, 32);
-      const skyMaterial = new THREE.MeshBasicMaterial({
-        color: 0x87CEEB,
-        side: THREE.BackSide
-      });
+      const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87CEEB, side: THREE.BackSide });
       const sky = new THREE.Mesh(skyGeometry, skyMaterial);
       scene.add(sky);
 
-      // Montanhas
-      const mountainGeometry = new THREE.ConeGeometry(300, 600, 4);
-      const mountainMaterial = new THREE.MeshLambertMaterial({color: 0x555555});
-      for (let i = -2; i <= 2; i++) {
-        const mountain = new THREE.Mesh(mountainGeometry, mountainMaterial);
-        mountain.position.set(i * 800, -100, -1500);
-        scene.add(mountain);
+      // Terreno orgânico (montanhas)
+      const simplex = new SimplexNoise();
+      const terrainGeometry = new THREE.PlaneGeometry(4000, 4000, 200, 200);
+      terrainGeometry.rotateX(-Math.PI/2);
+      const pos = terrainGeometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const z = pos.getZ(i);
+        const y = simplex.noise2D(x * 0.001, z * 0.001) * 200; // altura irregular
+        pos.setY(i, y);
       }
-
-      // Gramado
-      const grassTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/grasslight-big.jpg");
-      grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
-      grassTexture.repeat.set(50, 50);
-      const planeGeometry = new THREE.PlaneGeometry(2000, 2000);
-      const planeMaterial = new THREE.MeshLambertMaterial({map: grassTexture});
-      const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-      plane.rotation.x = -Math.PI/2;
-      scene.add(plane);
+      terrainGeometry.computeVertexNormals();
+      const terrainTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/terrain/grasslight-big.jpg");
+      terrainTexture.wrapS = terrainTexture.wrapT = THREE.RepeatWrapping;
+      terrainTexture.repeat.set(50, 50);
+      const terrainMaterial = new THREE.MeshLambertMaterial({ map: terrainTexture });
+      const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
+      terrain.position.y = -50;
+      scene.add(terrain);
 
       // Entidade luminosa
       const entityGeometry = new THREE.SphereGeometry(5, 64, 64);
-      const entityMaterial = new THREE.MeshBasicMaterial({
-        color: 0x88ccff,
-        transparent: true,
-        opacity: 0.6
-      });
+      const entityMaterial = new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.6 });
       const entity = new THREE.Mesh(entityGeometry, entityMaterial);
       entity.position.set(0, 5, 0);
       scene.add(entity);
@@ -148,42 +114,13 @@
         spheres.push(s);
       }
 
-      // Lago
-      const waterTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/water.jpg");
-      waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
-      waterTexture.repeat.set(4, 4);
-      const lakeGeometry = new THREE.PlaneGeometry(400, 300);
-      const lakeMaterial = new THREE.MeshPhongMaterial({
-        map: waterTexture,
-        transparent: true,
-        opacity: 0.8
-      });
-      const lake = new THREE.Mesh(lakeGeometry, lakeMaterial);
-      lake.rotation.x = -Math.PI/2;
-      lake.position.set(-500, 0, 200);
-      scene.add(lake);
-
-      // Cachoeira
-      const waterfallTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/water.jpg");
-      waterfallTexture.wrapS = waterfallTexture.wrapT = THREE.RepeatWrapping;
-      const waterfallGeometry = new THREE.PlaneGeometry(100, 300);
-      const waterfallMaterial = new THREE.MeshPhongMaterial({
-        map: waterfallTexture,
-        transparent: true,
-        opacity: 0.7
-      });
-      const waterfall = new THREE.Mesh(waterfallGeometry, waterfallMaterial);
-      waterfall.position.set(-600, 150, -800);
-      scene.add(waterfall);
-
       // Luz
-      const ambientLight = new THREE.AmbientLight(0x888888);
-      scene.add(ambientLight);
+      scene.add(new THREE.AmbientLight(0x888888));
       const sunLight = new THREE.DirectionalLight(0xffffff, 1);
       sunLight.position.set(100, 200, 100);
       scene.add(sunLight);
 
-      camera.position.set(0, 50, 100);
+      camera.position.set(0, 200, 400);
 
       function animate() {
         requestAnimationFrame(animate);
@@ -191,7 +128,6 @@
           s.position.y = 5 + Math.sin(Date.now() * 0.002 + i) * 2;
         });
         sky.rotation.y += 0.0002;
-        waterfallTexture.offset.y -= 0.01; // animação da cachoeira
         renderer.render(scene, camera);
       }
       animate();
