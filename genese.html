@@ -94,23 +94,23 @@
       const renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
       renderer.setSize(window.innerWidth, window.innerHeight);
 
-      // Céu (sky dome)
+      // Céu (sky dome) com cor azul clara
       const skyGeometry = new THREE.SphereGeometry(3000, 32, 32);
       const skyMaterial = new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("https://threejs.org/examples/textures/skyboxsun25degtest.png"),
+        color: 0x87CEEB, // azul céu
         side: THREE.BackSide
       });
       const sky = new THREE.Mesh(skyGeometry, skyMaterial);
       scene.add(sky);
 
-      // Montanhas
-      const mountainTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/terrain/rock.jpg");
-      const mountainGeometry = new THREE.PlaneGeometry(4000, 1000);
-      const mountainMaterial = new THREE.MeshLambertMaterial({map: mountainTexture});
-      const mountains = new THREE.Mesh(mountainGeometry, mountainMaterial);
-      mountains.rotation.x = -Math.PI/2.5;
-      mountains.position.set(0, -100, -1500);
-      scene.add(mountains);
+      // Montanhas simples
+      const mountainGeometry = new THREE.ConeGeometry(300, 600, 4);
+      const mountainMaterial = new THREE.MeshLambertMaterial({color: 0x555555});
+      for (let i = -2; i <= 2; i++) {
+        const mountain = new THREE.Mesh(mountainGeometry, mountainMaterial);
+        mountain.position.set(i * 800, -100, -1500);
+        scene.add(mountain);
+      }
 
       // Gramado
       const grassTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/grasslight-big.jpg");
