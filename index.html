@@ -2,172 +2,95 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Gênese</title>
+  <title>Entrada - Universo</title>
   <style>
     body {
       margin: 0;
-      background: black;
       overflow: hidden;
+      background: black;
       font-family: 'Arial', sans-serif;
     }
-
-    /* Texto inicial */
-    .genese-text {
+    canvas {
+      display: block;
+    }
+    .overlay {
       position: absolute;
-      top: 40%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 2em;
-      color: #ffffff;
       text-align: center;
-      opacity: 1;
-      animation: smokeFade 15s forwards;
+      color: #ffffff;
       z-index: 10;
     }
-
-    @keyframes smokeFade {
-      0% { opacity: 1; filter: blur(0px); }
-      50% { opacity: 0.7; filter: blur(4px); }
-      100% { opacity: 0; filter: blur(10px); }
+    .welcome-text {
+      font-size: 1.2em; /* menor para caber dentro da esfera */
+      margin-bottom: 15px;
+      animation: fadeGlow 4s ease-in-out infinite alternate;
     }
-
-    /* Barra de carregamento */
-    .progress-container {
-      position: absolute;
-      bottom: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 300px;
-      height: 20px;
-      background: #333;
-      border-radius: 10px;
-      overflow: hidden;
+    .link-genese {
+      color: #88ccff;
+      font-size: 1.1em;
+      text-decoration: none;
+      border: 2px solid #88ccff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: all 0.5s ease;
     }
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #88ccff, #ffffff);
-      transition: width 0.2s;
+    .link-genese:hover {
+      background: #88ccff;
+      color: black;
+      box-shadow: 0 0 20px #88ccff;
     }
-
-    #scene {
-      width: 100%;
-      height: 100%;
-      display: none; /* escondido até ativar o cenário */
+    @keyframes fadeGlow {
+      from {
+        opacity: 0.4;
+        text-shadow: 0 0 10px #88ccff, 0 0 20px #88ccff;
+      }
+      to {
+        opacity: 1;
+        text-shadow: 0 0 20px #ffffff, 0 0 40px #88ccff, 0 0 60px #88ccff;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Texto inicial -->
-  <div class="genese-text">
-    No princípio, havia apenas o vazio.<br>
-    Da escuridão nasceu a luz.<br>
-    E da luz, o cosmos começou a se formar.<br>
-    Esta é a Gênese do Universo.
+  <div class="overlay">
+    <div class="welcome-text">Bem-vindo ao Universo</div>
+    <a href="genese.html" class="link-genese">Entrar na Gênese</a>
   </div>
-
-  <!-- Barra de progresso -->
-  <div class="progress-container">
-    <div class="progress-bar" id="progress"></div>
-  </div>
-
-  <!-- Canvas já presente -->
-  <canvas id="scene"></canvas>
 
   <!-- Three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
-    const duration = 15000; // 15 segundos
-    const progressBar = document.getElementById("progress");
-    let startTime = Date.now();
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 4000);
+    const renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    // Atualiza a barra de progresso
-    function updateProgress() {
-      let elapsed = Date.now() - startTime;
-      let percent = Math.min((elapsed / duration) * 100, 100);
-      progressBar.style.width = percent + "%";
-      if (elapsed < duration) {
-        requestAnimationFrame(updateProgress);
-      }
+    // Fundo estelar
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 2500;
+    const starVertices = [];
+    for (let i = 0; i < starCount; i++) {
+      const x = (Math.random() - 0.5) * 2000;
+      const y = (Math.random() - 0.5) * 2000;
+      const z = (Math.random() - 0.5) * 2000;
+      starVertices.push(x, y, z);
     }
-    updateProgress();
+    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+    const starMaterial = new THREE.PointsMaterial({color: 0xffffff, size: 1.2});
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
 
-    // Após 15 segundos, esconder texto e mostrar cenário
-    setTimeout(() => {
-      document.querySelector(".genese-text").style.display = "none";
-      document.querySelector(".progress-container").style.display = "none";
-      iniciarCenario();
-    }, duration);
+    // Esfera verde opaca
+    const sphereGeometry = new THREE.SphereGeometry(2, 64, 64);
+    const sphereMaterial = new THREE.MeshPhongMaterial({
+      color: 0x228B22, // verde
+      shininess: 80
+    });
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    scene.add(sphere);
 
-    function iniciarCenario() {
-      const canvas = document.getElementById("scene");
-      canvas.style.display = "block";
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 5000);
-      const renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
-      renderer.setSize(window.innerWidth, window.innerHeight);
-
-      // Plano gramado
-      const grassTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/grasslight-big.jpg");
-      grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
-      grassTexture.repeat.set(50, 50);
-      const planeGeometry = new THREE.PlaneGeometry(2000, 2000);
-      const planeMaterial = new THREE.MeshLambertMaterial({map: grassTexture});
-      const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-      plane.rotation.x = -Math.PI/2;
-      scene.add(plane);
-
-      // Entidade luminosa central
-      const entityGeometry = new THREE.SphereGeometry(5, 64, 64);
-      const entityMaterial = new THREE.MeshBasicMaterial({
-        color: 0x88ccff,
-        transparent: true,
-        opacity: 0.6
-      });
-      const entity = new THREE.Mesh(entityGeometry, entityMaterial);
-      entity.position.set(0, 5, 0);
-      scene.add(entity);
-
-      // 12 esferas flutuando ao redor
-      const spheres = [];
-      for (let i = 0; i < 12; i++) {
-        const angle = (i / 12) * Math.PI * 2;
-        const x = Math.cos(angle) * 30;
-        const z = Math.sin(angle) * 30;
-        const sphereGeo = new THREE.SphereGeometry(2, 32, 32);
-        const sphereMat = new THREE.MeshPhongMaterial({color: 0xffffff});
-        const s = new THREE.Mesh(sphereGeo, sphereMat);
-        s.position.set(x, 5, z);
-        scene.add(s);
-        spheres.push(s);
-      }
-
-      // Luz ambiente e direcional
-      const ambientLight = new THREE.AmbientLight(0x888888);
-      scene.add(ambientLight);
-      const sunLight = new THREE.DirectionalLight(0xffffff, 1);
-      sunLight.position.set(100, 200, 100);
-      scene.add(sunLight);
-
-      camera.position.set(0, 50, 100);
-
-      // Animação
-      function animate() {
-        requestAnimationFrame(animate);
-        spheres.forEach((s, i) => {
-          s.position.y = 5 + Math.sin(Date.now() * 0.002 + i) * 2;
-        });
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-    }
-  </script>
-</body>
-</html>
+    // Aura azul pulsante
+    const auraGeometry = new THREE
