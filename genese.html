@@ -83,11 +83,25 @@
       spheres.push(s);
     }
 
-    // Luz ambiente
-    scene.add(new THREE.AmbientLight(0x555555));
-    const sunLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    sunLight.position.set(100, 200, 100);
-    scene.add(sunLight);
+    // Luz ambiente mais forte
+    const ambientLight = new THREE.AmbientLight(0x888888, 1.2);
+    scene.add(ambientLight);
+
+    // Spotlight sobre a praça
+    const plazaLight = new THREE.SpotLight(0xffffff, 0.8, 500, Math.PI/4, 0.5, 2);
+    plazaLight.position.set(0, 200, 0);
+    plazaLight.target = plaza;
+    scene.add(plazaLight);
+
+    // Luzes pontuais nos bancos
+    for (let i = 0; i < 4; i++) {
+      const angle = (i / 4) * Math.PI * 2;
+      const x = Math.cos(angle) * 150;
+      const z = Math.sin(angle) * 150;
+      const benchLight = new THREE.PointLight(0xffcc88, 0.6, 200);
+      benchLight.position.set(x, 80, z);
+      scene.add(benchLight);
+    }
 
     // Controles em primeira pessoa
     const controls = new THREE.PointerLockControls(camera, document.body);
@@ -160,8 +174,4 @@
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  </script>
-</body>
-</html>
+      renderer.setSize(window.innerWidth, window.inner
