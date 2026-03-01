@@ -80,7 +80,7 @@
       scene.add(room);
 
       // Cúpula azul com mapa estelar
-      const starsTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg");
+      const starsTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/planets/starfield.png");
       const domeGeometry = new THREE.SphereGeometry(500, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
       const domeMaterial = new THREE.MeshPhongMaterial({
         color: 0x3399ff,
@@ -139,4 +139,36 @@
         const z = Math.sin(angle) * 60;
         const sphereGeo = new THREE.SphereGeometry(5, 16, 16);
         const sphereMat = new THREE.MeshPhongMaterial({ color: 0xffffff });
-        const s = new THREE.Mesh(sphereGeo,
+        const s = new THREE.Mesh(sphereGeo, sphereMat);
+        s.position.set(x, 20, z);
+        scene.add(s);
+        spheres.push(s);
+      }
+
+      // Luz ambiente
+      scene.add(new THREE.AmbientLight(0x555555));
+      const sunLight = new THREE.DirectionalLight(0xffffff, 0.6);
+      sunLight.position.set(100, 200, 100);
+      scene.add(sunLight);
+
+      camera.position.set(0, 150, 300);
+
+      function animate() {
+        requestAnimationFrame(animate);
+        spheres.forEach((s, i) => {
+          s.position.y = 20 + Math.sin(Date.now() * 0.002 + i) * 5;
+        });
+        dome.rotation.y += 0.0002;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+  </script>
+</body>
+</html>
