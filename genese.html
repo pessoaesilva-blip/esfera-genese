@@ -19,8 +19,7 @@
     document.body.appendChild(renderer.domElement);
 
     // Sala metálica
-    const wallTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/uv_grid_sm.jpg");
-    const roomMaterial = new THREE.MeshPhongMaterial({ map: wallTexture, side: THREE.BackSide, color: 0x888888 });
+    const roomMaterial = new THREE.MeshPhongMaterial({ color: 0x444444, side: THREE.BackSide });
     const roomGeometry = new THREE.BoxGeometry(1000, 500, 1000);
     const room = new THREE.Mesh(roomGeometry, roomMaterial);
     scene.add(room);
@@ -50,7 +49,7 @@
       spheres.push(s);
     }
 
-    // Luzes
+    // Luzes iguais ao teste do cubo
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
     scene.add(ambientLight);
 
@@ -58,11 +57,7 @@
     dirLight.position.set(200, 300, 200);
     scene.add(dirLight);
 
-    const domeLight = new THREE.PointLight(0x3399ff, 0.6, 1000);
-    domeLight.position.set(0, 250, 0);
-    scene.add(domeLight);
-
-    // Cúpula azul
+    // Cúpula azul translúcida
     const domeGeometry = new THREE.SphereGeometry(500, 32, 32, 0, Math.PI*2, 0, Math.PI/2);
     const domeMaterial = new THREE.MeshPhongMaterial({ color: 0x3399ff, transparent: true, opacity: 0.4 });
     const dome = new THREE.Mesh(domeGeometry, domeMaterial);
@@ -91,6 +86,7 @@
       if (e.code === 'KeyD') moveRight = false;
     });
 
+    // Câmera igual ao teste do cubo
     camera.position.set(0, 150, 400);
     camera.lookAt(0, 50, 0);
 
