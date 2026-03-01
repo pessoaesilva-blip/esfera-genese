@@ -2,115 +2,52 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Gênese</title>
+  <title>Esfera Azul</title>
   <style>
-    body { margin: 0; background: black; overflow: hidden; }
+    body { margin: 0; background: white; overflow: hidden; }
     canvas { display: block; }
   </style>
 </head>
 <body>
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/PointerLockControls.js"></script>
   <script>
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Sala menor e clara
-    const roomGeometry = new THREE.BoxGeometry(200, 200, 200);
-    const roomMaterial = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, side: THREE.BackSide });
-    const room = new THREE.Mesh(roomGeometry, roomMaterial);
-    scene.add(room);
+    // Esfera azul no centro
+    const geometry = new THREE.SphereGeometry(50, 32, 32);
+    const material = new THREE.MeshPhongMaterial({ color: 0x0000ff });
+    const sphere = new THREE.Mesh(geometry, material);
+    scene.add(sphere);
 
-    // Praça elevada
-    const plazaGeometry = new THREE.CircleGeometry(50, 32);
-    const plazaMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 });
-    const plaza = new THREE.Mesh(plazaGeometry, plazaMaterial);
-    plaza.rotation.x = -Math.PI/2;
-    plaza.position.y = -50;
-    scene.add(plaza);
-
-    // Entidade luminosa
-    const entity = new THREE.Mesh(new THREE.SphereGeometry(10, 32, 32), new THREE.MeshBasicMaterial({ color: 0x88ccff }));
-    entity.position.set(0, -30, 0);
-    scene.add(entity);
-
-    // Esferas flutuantes
-    const spheres = [];
-    for (let i = 0; i < 8; i++) {
-      const angle = (i / 8) * Math.PI * 2;
-      const x = Math.cos(angle) * 40;
-      const z = Math.sin(angle) * 40;
-      const s = new THREE.Mesh(new THREE.SphereGeometry(5, 16, 16), new THREE.MeshPhongMaterial({ color: 0xffffff }));
-      s.position.set(x, -30, z);
-      scene.add(s);
-      spheres.push(s);
-    }
-
-    // Luzes fortes
-    const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+    // Luz ambiente para iluminar a esfera
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
     scene.add(ambientLight);
 
+    // Luz direcional para dar volume
     const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.position.set(50, 100, 50);
+    dirLight.position.set(100, 100, 100);
     scene.add(dirLight);
 
-    // Cúpula azul translúcida
-    const domeGeometry = new THREE.SphereGeometry(100, 32, 32, 0, Math.PI*2, 0, Math.PI/2);
-    const domeMaterial = new THREE.MeshPhongMaterial({ color: 0x3399ff, transparent: true, opacity: 0.4 });
-    const dome = new THREE.Mesh(domeGeometry, domeMaterial);
-    dome.position.y = 50;
-    scene.add(dome);
-
-    // Controles em primeira pessoa
-    const controls = new THREE.PointerLockControls(camera, document.body);
-    document.body.addEventListener('click', () => controls.lock());
-    scene.add(controls.getObject());
-
-    let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-    const velocity = new THREE.Vector3();
-    const direction = new THREE.Vector3();
-
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'KeyW') moveForward = true;
-      if (e.code === 'KeyS') moveBackward = true;
-      if (e.code === 'KeyA') moveLeft = true;
-      if (e.code === 'KeyD') moveRight = true;
-    });
-    document.addEventListener('keyup', (e) => {
-      if (e.code === 'KeyW') moveForward = false;
-      if (e.code === 'KeyS') moveBackward = false;
-      if (e.code === 'KeyA') moveLeft = false;
-      if (e.code === 'KeyD') moveRight = false;
-    });
-
-    // Câmera dentro da sala
-    camera.position.set(0, 0, 100);
-    camera.lookAt(0, 0, 0);
+    // Posição da câmera
+    camera.position.z = 200;
 
     function animate() {
       requestAnimationFrame(animate);
-
-      // movimento WASD
-      direction.set(0,0,0);
-      if (moveForward) direction.z -= 1;
-      if (moveBackward) direction.z += 1;
-      if (moveLeft) direction.x -= 1;
-      if (moveRight) direction.x += 1;
-      direction.normalize();
-      velocity.add(direction.multiplyScalar(0.2));
-      controls.moveRight(velocity.x);
-      controls.moveForward(velocity.z);
-      velocity.multiplyScalar(0.9);
-
-      spheres.forEach((s, i) => {
-        s.position.y = -30 + Math.sin(Date.now() * 0.002 + i) * 5;
-      });
-
+      sphere.rotation.y += 0.01; // esfera gira lentamente
       renderer.render(scene, camera);
     }
     animate();
 
+    // Responsividade
     window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
