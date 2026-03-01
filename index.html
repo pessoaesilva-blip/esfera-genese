@@ -10,6 +10,8 @@
       overflow: hidden;
       font-family: 'Arial', sans-serif;
     }
+
+    /* Texto inicial */
     .genese-text {
       position: absolute;
       top: 50%;
@@ -19,19 +21,22 @@
       color: #ffffff;
       text-align: center;
       opacity: 1;
-      animation: smokeFade 20s forwards;
+      animation: smokeFade 15s forwards;
     }
+
     @keyframes smokeFade {
       0% { opacity: 1; filter: blur(0px); }
       50% { opacity: 0.7; filter: blur(4px); }
       100% { opacity: 0; filter: blur(10px); }
     }
+
     canvas {
       display: none; /* escondido até ativar o cenário */
     }
   </style>
 </head>
 <body>
+  <!-- Texto inicial -->
   <div class="genese-text">
     No princípio, havia apenas o vazio.<br>
     Da escuridão nasceu a luz.<br>
@@ -42,11 +47,11 @@
   <!-- Three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
-    // Após 20 segundos, esconder texto e mostrar cenário
+    // Após 15 segundos, esconder texto e mostrar cenário
     setTimeout(() => {
       document.querySelector(".genese-text").style.display = "none";
       iniciarCenario();
-    }, 20000);
+    }, 15000);
 
     function iniciarCenario() {
       const scene = new THREE.Scene();
