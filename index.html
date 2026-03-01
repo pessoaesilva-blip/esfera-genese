@@ -14,7 +14,7 @@
     /* Texto inicial */
     .genese-text {
       position: absolute;
-      top: 50%;
+      top: 40%;
       left: 50%;
       transform: translate(-50%, -50%);
       font-size: 2em;
@@ -29,6 +29,25 @@
       0% { opacity: 1; filter: blur(0px); }
       50% { opacity: 0.7; filter: blur(4px); }
       100% { opacity: 0; filter: blur(10px); }
+    }
+
+    /* Barra de carregamento */
+    .progress-container {
+      position: absolute;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 20px;
+      background: #333;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #88ccff, #ffffff);
+      transition: width 0.2s;
     }
 
     #scene {
@@ -47,17 +66,38 @@
     Esta é a Gênese do Universo.
   </div>
 
+  <!-- Barra de progresso -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+
   <!-- Canvas já presente -->
   <canvas id="scene"></canvas>
 
   <!-- Three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
+    const duration = 15000; // 15 segundos
+    const progressBar = document.getElementById("progress");
+    let startTime = Date.now();
+
+    // Atualiza a barra de progresso
+    function updateProgress() {
+      let elapsed = Date.now() - startTime;
+      let percent = Math.min((elapsed / duration) * 100, 100);
+      progressBar.style.width = percent + "%";
+      if (elapsed < duration) {
+        requestAnimationFrame(updateProgress);
+      }
+    }
+    updateProgress();
+
     // Após 15 segundos, esconder texto e mostrar cenário
     setTimeout(() => {
       document.querySelector(".genese-text").style.display = "none";
+      document.querySelector(".progress-container").style.display = "none";
       iniciarCenario();
-    }, 15000);
+    }, duration);
 
     function iniciarCenario() {
       const canvas = document.getElementById("scene");
