@@ -21,14 +21,7 @@
       color: #ffffff;
       text-align: center;
       opacity: 1;
-      animation: smokeFade 15s forwards;
       z-index: 10;
-    }
-
-    @keyframes smokeFade {
-      0% { opacity: 1; filter: blur(0px); }
-      50% { opacity: 0.7; filter: blur(4px); }
-      100% { opacity: 0; filter: blur(10px); }
     }
 
     /* Barra de carregamento */
@@ -42,6 +35,7 @@
       background: #333;
       border-radius: 10px;
       overflow: hidden;
+      display: none; /* só aparece depois dos 15s iniciais */
     }
     .progress-bar {
       height: 100%;
@@ -59,7 +53,7 @@
 </head>
 <body>
   <!-- Texto inicial -->
-  <div class="genese-text">
+  <div class="genese-text" id="texto">
     No princípio, havia apenas o vazio.<br>
     Da escuridão nasceu a luz.<br>
     E da luz, o cosmos começou a se formar.<br>
@@ -67,37 +61,41 @@
   </div>
 
   <!-- Barra de progresso -->
-  <div class="progress-container">
+  <div class="progress-container" id="progress-container">
     <div class="progress-bar" id="progress"></div>
   </div>
 
-  <!-- Canvas já presente -->
+  <!-- Canvas -->
   <canvas id="scene"></canvas>
 
   <!-- Three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
-    const duration = 15000; // 15 segundos
+    const texto = document.getElementById("texto");
+    const progressContainer = document.getElementById("progress-container");
     const progressBar = document.getElementById("progress");
-    let startTime = Date.now();
+    const duration = 15000; // duração da barra: 15s
 
-    // Atualiza a barra de progresso
-    function updateProgress() {
-      let elapsed = Date.now() - startTime;
-      let percent = Math.min((elapsed / duration) * 100, 100);
-      progressBar.style.width = percent + "%";
-      if (elapsed < duration) {
-        requestAnimationFrame(updateProgress);
-      }
-    }
-    updateProgress();
-
-    // Após 15 segundos, esconder texto e mostrar cenário
+    // Após 15 segundos de leitura, mostrar a barra
     setTimeout(() => {
-      document.querySelector(".genese-text").style.display = "none";
-      document.querySelector(".progress-container").style.display = "none";
-      iniciarCenario();
-    }, duration);
+      progressContainer.style.display = "block";
+      let startTime = Date.now();
+
+      function updateProgress() {
+        let elapsed = Date.now() - startTime;
+        let percent = Math.min((elapsed / duration) * 100, 100);
+        progressBar.style.width = percent + "%";
+        if (elapsed < duration) {
+          requestAnimationFrame(updateProgress);
+        } else {
+          // fim da barra: esconder texto e barra, iniciar cenário
+          texto.style.display = "none";
+          progressContainer.style.display = "none";
+          iniciarCenario();
+        }
+      }
+      updateProgress();
+    }, 15000);
 
     function iniciarCenario() {
       const canvas = document.getElementById("scene");
