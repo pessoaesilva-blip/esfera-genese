@@ -2,148 +2,148 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Luna Eclipse | IA Viva</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luna Eclipse</title>
 
 <style>
 body{
-    margin:0;
-    background:black;
-    font-family:Segoe UI, sans-serif;
-    color:white;
-    overflow:hidden;
+margin:0;
+background:radial-gradient(circle at center,#12002a 0%,#000 70%);
+overflow:hidden;
+font-family:Segoe UI,sans-serif;
+color:white;
 }
 
-#bg{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:-1;
+/* Fundo estrelado animado */
+.stars{
+position:fixed;
+width:100%;
+height:100%;
+background:url("https://www.transparenttextures.com/patterns/stardust.png");
+animation:moveStars 60s linear infinite;
+opacity:0.6;
+z-index:-2;
 }
 
+@keyframes moveStars{
+from{background-position:0 0;}
+to{background-position:10000px 5000px;}
+}
+
+/* Aura */
+.aura{
+position:absolute;
+bottom:10%;
+left:50%;
+transform:translateX(-50%);
+width:450px;
+height:450px;
+background:radial-gradient(circle,#7a4dff55 0%,transparent 70%);
+filter:blur(40px);
+animation:pulse 6s infinite alternate;
+z-index:-1;
+}
+
+@keyframes pulse{
+from{opacity:0.6;transform:translateX(-50%) scale(1);}
+to{opacity:1;transform:translateX(-50%) scale(1.1);}
+}
+
+/* Luna */
 .luna{
-    position:absolute;
-    bottom:8%;
-    left:50%;
-    transform:translateX(-50%);
-    width:380px;
-    animation:float 6s ease-in-out infinite;
+position:absolute;
+bottom:10%;
+left:50%;
+transform:translateX(-50%);
+width:380px;
+animation:float 6s ease-in-out infinite;
 }
 
 @keyframes float{
-    0%,100%{transform:translate(-50%,0)}
-    50%{transform:translate(-50%,-25px)}
+0%,100%{transform:translate(-50%,0);}
+50%{transform:translate(-50%,-20px);}
 }
 
+/* Chat */
 .chat{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    width:360px;
-    background:rgba(15,0,40,0.85);
-    border-radius:20px;
-    padding:20px;
-    backdrop-filter:blur(12px);
+position:fixed;
+right:20px;
+bottom:20px;
+width:350px;
+background:rgba(20,0,50,0.9);
+padding:20px;
+border-radius:20px;
+backdrop-filter:blur(15px);
+box-shadow:0 0 20px #7a4dff55;
 }
 
 textarea{
-    width:100%;
-    height:60px;
-    background:black;
-    color:white;
-    border:none;
-    padding:10px;
-    border-radius:10px;
-    resize:none;
+width:100%;
+height:60px;
+background:black;
+color:white;
+border:none;
+padding:10px;
+border-radius:10px;
+resize:none;
 }
 
 button{
-    margin-top:10px;
-    width:100%;
-    padding:10px;
-    background:#6a3cff;
-    border:none;
-    color:white;
-    border-radius:10px;
-    cursor:pointer;
+margin-top:10px;
+width:100%;
+padding:10px;
+background:#7a4dff;
+border:none;
+color:white;
+border-radius:10px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#9c6cff;
 }
 
 .response{
-    margin-top:15px;
-    max-height:150px;
-    overflow:auto;
-    font-size:14px;
+margin-top:15px;
+max-height:150px;
+overflow:auto;
+font-size:14px;
 }
 </style>
 </head>
+
 <body>
 
-<canvas id="bg"></canvas>
+<div class="stars"></div>
+<div class="aura"></div>
 
-<img src="SUA_IMAGEM_DA_LUNA.png" class="luna">
+<img src="luna.png" class="luna">
 
 <div class="chat">
-<textarea id="input" placeholder="Pergunte sobre minha origem..."></textarea>
-<button onclick="askLuna()">Conversar com Luna</button>
+<textarea id="input" placeholder="Pergunte algo para Luna..."></textarea>
+<button onclick="askLuna()">Conversar</button>
 <div class="response" id="response"></div>
 </div>
 
-<script type="module">
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.z = 30;
-
-const renderer = new THREE.WebGLRenderer({canvas:document.getElementById("bg")});
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-const starGeo = new THREE.BufferGeometry();
-const vertices = [];
-
-for(let i=0;i<2000;i++){
-    vertices.push(
-        THREE.MathUtils.randFloatSpread(600),
-        THREE.MathUtils.randFloatSpread(600),
-        THREE.MathUtils.randFloatSpread(600)
-    );
-}
-
-starGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices,3));
-
-const stars = new THREE.Points(
-    starGeo,
-    new THREE.PointsMaterial({color:0xbb88ff,size:0.7})
-);
-
-scene.add(stars);
-
-function animate(){
-    requestAnimationFrame(animate);
-    stars.rotation.y += 0.0005;
-    renderer.render(scene,camera);
-}
-animate();
-</script>
-
 <script>
 async function askLuna(){
-    const input = document.getElementById("input").value;
-    const responseDiv = document.getElementById("response");
-    responseDiv.innerHTML = "Luna está pensando...";
+const input=document.getElementById("input").value;
+const responseDiv=document.getElementById("response");
+responseDiv.innerHTML="Luna está pensando...";
 
-    const res = await fetch("/api/chat",{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body:JSON.stringify({ message: input })
-    });
+try{
+const res=await fetch("/api/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:input})
+});
 
-    const data = await res.json();
-    const reply = data.choices[0].message.content;
-
-    responseDiv.innerHTML = reply;
+const data=await res.json();
+responseDiv.innerHTML=data.choices[0].message.content;
+}catch(err){
+responseDiv.innerHTML="Erro ao conectar com Luna.";
+}
 }
 </script>
 
